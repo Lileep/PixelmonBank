@@ -21,7 +21,9 @@ import net.minecraft.util.text.TextFormatting;
         SendCmd.class,
         GetCmd.class,
         SeeCmd.class,
-        GetAllCmd.class
+        GetAllCmd.class,
+        ReloadCmd.class,
+        DeleteAllCmd.class
 })
 public class PixelmonBankCmd {
 
