@@ -43,7 +43,7 @@ public class GetAllCmd {
 
         //whether player have pixelmons in bank
         if (pokemonList.size() < 1) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "You don't have any pixelmons in your Pixelmon Bank.");
+            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "You don't have any pixelmons in Pixelmon Bank.");
             return;
         }
 
