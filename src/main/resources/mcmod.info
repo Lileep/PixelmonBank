@@ -1,0 +1,16 @@
+[
+{
+  "modid": "pixelmonbank",
+  "name": "Pixelmon Bank",
+  "description": "Server pixelmon transfer system",
+  "version": "1.0",
+  "mcversion": "1.12.2",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Lileep"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
