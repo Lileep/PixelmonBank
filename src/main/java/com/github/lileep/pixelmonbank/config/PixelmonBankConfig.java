@@ -24,7 +24,7 @@ public class PixelmonBankConfig {
 
     //pre load
     public static void loadLanguage(){
-        LOCALE = config.get("general", "locale", LOCALE).getString();
+        LOCALE = config.get("general", "language", LOCALE).getString();
     }
 
     public static void loadConfig(final String configurationPath) {
@@ -46,22 +46,23 @@ public class PixelmonBankConfig {
     //post load
     public static void loadConfig(){
         String category = "general";
-        config.addCustomCategoryComment(category, "General settings for Pixelmon Bank");
+        config.addCustomCategoryComment(category, PixelmonBankLocaleConfig.cfgCategoryGeneral);
 
-        ALLOW_LEGENDARY = config.get(category, "allow_legendary", ALLOW_LEGENDARY, "Whether allow legendaries to be sent to Pixelmon Bank").getBoolean();
-        ALLOW_ULTRABEAST = config.get(category, "allow_ultrabeast", ALLOW_ULTRABEAST, "Whether allow ultra beasts to be sent to Pixelmon Bank").getBoolean();
-        BLACK_LIST = config.get(category, "black_list", BLACK_LIST, "Listed pixelmons will be prohibited from being sent to Pixelmon Bank").getStringList();
+        ALLOW_LEGENDARY = config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).getBoolean();
+        config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).setComment(PixelmonBankLocaleConfig.cfgAllowLegendary);
+        ALLOW_ULTRABEAST = config.get(category, "allow_ultrabeast", ALLOW_ULTRABEAST, PixelmonBankLocaleConfig.cfgAllowUltraBeast).getBoolean();
+        BLACK_LIST = config.get(category, "black_list", BLACK_LIST, PixelmonBankLocaleConfig.cfgBlackList).getStringList();
 
 
         category = "database";
-        config.addCustomCategoryComment(category, "Database settings for Pixelmon Bank. Restart server to apply instead of reload");
-        SERVER_NAME = config.get(category, "server_name", SERVER_NAME, "Name of your server. Make this as a database field").getString();
+        config.addCustomCategoryComment(category, PixelmonBankLocaleConfig.cfgCategoryDB);
+        SERVER_NAME = config.get(category, "server_name", SERVER_NAME, PixelmonBankLocaleConfig.cfgServerName).getString();
 
-        DB_IP = config.get(category, "database_ip", DB_IP, "IP address of database").getString();
-        DB_PORT = config.get(category, "database_port", DB_PORT, "Port of database").getInt();
-        DB_DBNAME = config.get(category, "database_name", DB_DBNAME, "Name of database").getString();
-        DB_USERNAME = config.get(category, "database_username", DB_USERNAME, "User name of database").getString();
-        DB_PASSWD = config.get(category, "database_passwd", DB_PASSWD, "Password of database").getString();
+        DB_IP = config.get(category, "database_ip", DB_IP, PixelmonBankLocaleConfig.cfgDBIP).getString();
+        DB_PORT = config.get(category, "database_port", DB_PORT, PixelmonBankLocaleConfig.cfgDBPort).getInt();
+        DB_DBNAME = config.get(category, "database_name", DB_DBNAME, PixelmonBankLocaleConfig.cfgDBName).getString();
+        DB_USERNAME = config.get(category, "database_username", DB_USERNAME, PixelmonBankLocaleConfig.cfgDBUsername).getString();
+        DB_PASSWD = config.get(category, "database_passwd", DB_PASSWD, PixelmonBankLocaleConfig.cfgDBPasswd).getString();
 
 
         if (config.hasChanged()) {
