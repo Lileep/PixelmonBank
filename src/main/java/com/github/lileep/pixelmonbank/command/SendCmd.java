@@ -7,15 +7,15 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
+import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.google.common.collect.Lists;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.Optional;
 
@@ -26,15 +26,15 @@ import java.util.Optional;
 @Child
 public class SendCmd {
 
-    private String getUsage(){
-        return "/pixelmonbank send <slot>";
+    private String getUsage() {
+        return "&c/pixelmonbank send <" + PixelmonBankLocaleConfig.argSlot + ">";
     }
 
     @CommandProcessor
     public void run(@Sender EntityPlayerMP sender, String[] args) {
 
         if (args.length < 1) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, this.getUsage());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
             return;
         }
 
@@ -44,7 +44,7 @@ public class SendCmd {
             //Slot must in 1-6
             final int slot = Integer.parseInt(args[0].replaceAll("[^0-9]", ""));
             if (slot < 1 || slot > 6) {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Slot number must be between 1 and 6.");
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumLimited));
                 return;
             }
 
@@ -62,7 +62,7 @@ public class SendCmd {
                 pokemon = sStorage.get(slot - 1);
             } else {
                 //Nothing in the slot
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Nothing is in that slot.");
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
                 return;
             }
 
@@ -70,7 +70,7 @@ public class SendCmd {
             final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
             if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "You must have more than one none egg Pokemon in your party to do this.");
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
                 return;
             }
 
@@ -79,14 +79,14 @@ public class SendCmd {
 
             //Send logic
             EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
-            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), player.getName(), pokemon)){
+            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), player.getName(), pokemon)) {
                 //Delete player's pixelmon
                 sStorage.set(slot - 1, null);
-                CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Successfully send your " + pokemon.getDisplayName() + " to Pixelmon Bank!");
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
             }
 
         } catch (NumberFormatException e) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "Invalid slot number given.");
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumInvalid));
         }
     }
 }

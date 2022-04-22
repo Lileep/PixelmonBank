@@ -17,13 +17,11 @@ import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PixelmonReference;
 import com.github.lileep.pixelmonbank.lib.Reference;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -40,9 +38,6 @@ public class PixelmonBank {
     @Mod.Instance(Reference.MOD_ID)
     public static PixelmonBank instance;
 
-    public Configuration config;
-    public static File configDirectory;
-
     private final ForgePlayerManager playerManager = new ForgePlayerManager();
     private final ForgeCommandFactory commandFactory = new ForgeCommandFactory();
 
@@ -52,9 +47,8 @@ public class PixelmonBank {
     public void preInit(final FMLPreInitializationEvent event) {
         GuiFactory.setPlatformFactory(new ForgeGuiFactory());
         PixelmonBank.instance = this;
-        PixelmonBank.configDirectory = event.getModConfigurationDirectory();
-        (this.config = new Configuration(event.getSuggestedConfigurationFile())).load();
-        PixelmonBankConfig.loadConfig(this.config);
+
+        PixelmonBankConfig.loadConfig(event.getModConfigurationDirectory() + "/" + Reference.MOD_ID);
 
     }
 
@@ -79,7 +73,6 @@ public class PixelmonBank {
 
     @Mod.EventHandler
     public void onServerStart(final FMLServerStartingEvent event) {
-//        event.registerServerCommand(new PixelmonBankCmd());
         this.commandFactory.registerCommand(event.getServer(), new PixelmonBankCmd());
     }
 

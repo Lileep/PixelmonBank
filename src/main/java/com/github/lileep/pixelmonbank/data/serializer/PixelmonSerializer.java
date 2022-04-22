@@ -2,7 +2,7 @@ package com.github.lileep.pixelmonbank.data.serializer;
 
 import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
-import com.github.lileep.pixelmonbank.lib.SerializerReference;
+import com.github.lileep.pixelmonbank.lib.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pixelmonmod.pixelmon.Pixelmon;
@@ -64,6 +64,6 @@ public class PixelmonSerializer implements ISerializer {
 
     @Override
     public String getUniqueName() {
-        return SerializerReference.PIXELMON_SERIALIZER;
+        return Reference.PIXELMON_SERIALIZER;
     }
 }

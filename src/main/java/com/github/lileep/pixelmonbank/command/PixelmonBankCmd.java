@@ -4,9 +4,9 @@ import com.envyful.api.command.annotate.Command;
 import com.envyful.api.command.annotate.SubCommands;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
-import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
+import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
+import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.text.TextFormatting;
 
 @Command(
         value = "pixelmonbank",
@@ -28,11 +28,11 @@ import net.minecraft.util.text.TextFormatting;
 public class PixelmonBankCmd {
 
     private String getUsage() {
-        return "/pixelmonbank <" + "operation" +
-                ">";
+        return "&c/pixelmonbank <" + PixelmonBankLocaleConfig.argOperation + "> [<" + PixelmonBankLocaleConfig.argSlot + ">]";
     }
+
     @CommandProcessor
     public void run(@Sender ICommandSender sender, String[] args) {
-        CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, this.getUsage());
+        sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
     }
 }
