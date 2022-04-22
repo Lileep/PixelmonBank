@@ -7,14 +7,14 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
+import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,14 +43,14 @@ public class GetAllCmd {
 
         //whether player have pixelmons in bank
         if (pokemonList.size() < 1) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "You don't have any pixelmons in your Pixelmon Bank.");
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.haveNone));
             return;
         }
 
         //Remove success
         if (SyncHandler.getInstance().delAll(player.getUuid().toString())) {
             pokemonList.forEach(sStorage::add);
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Successfully get all of your pixelmons from Pixelmon Bank!");
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successGetAllMsg));
         }
     }
 }

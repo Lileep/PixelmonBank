@@ -4,11 +4,10 @@ package com.github.lileep.pixelmonbank.handler;
 import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
-import com.github.lileep.pixelmonbank.lib.SerializerReference;
+import com.github.lileep.pixelmonbank.lib.Reference;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 public class SyncHandler {
 
@@ -36,7 +35,7 @@ public class SyncHandler {
         //Prepare data
         DataPack dataPack = new DataPack();
 
-        ISerializer serializer = serializers.get(SerializerReference.PIXELMON_SERIALIZER);
+        ISerializer serializer = serializers.get(Reference.PIXELMON_SERIALIZER);
         dataPack.putData(serializer.getUniqueName(), serializer.serialize(pokemon));
 
         //Access db
@@ -55,7 +54,7 @@ public class SyncHandler {
 
         //Deal with NPE of dataPack
         if (Optional.ofNullable(dataPack).isPresent()) {
-            return serializers.get(SerializerReference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0);
+            return serializers.get(Reference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0);
         }
         return null;
 
@@ -66,7 +65,7 @@ public class SyncHandler {
         //Not necessary to judge null since db will return a new list
         List<Pokemon> pokemonList = new ArrayList<>();
         //If the list has no elements, for-each block will not be executed
-        dataPackList.forEach(dataPack -> pokemonList.add(serializers.get(SerializerReference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0)));
+        dataPackList.forEach(dataPack -> pokemonList.add(serializers.get(Reference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0)));
         return pokemonList;
     }
 

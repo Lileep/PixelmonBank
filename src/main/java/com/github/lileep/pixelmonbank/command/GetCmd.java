@@ -7,15 +7,14 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
+import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.Optional;
 
@@ -27,14 +26,14 @@ import java.util.Optional;
 public class GetCmd {
 
     private String getUsage() {
-        return "/pixelmonbank get <pokemon_uuid>";
+        return "&c/pixelmonbank get <pokemon_uuid>";
     }
 
     @CommandProcessor
     public void run(@Sender EntityPlayerMP sender, String[] args) {
 
         if (args.length < 1) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, this.getUsage());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
             return;
         }
 
@@ -54,7 +53,7 @@ public class GetCmd {
 
         //whether found this pixelmon
         if (!Optional.ofNullable(pokemon).isPresent()) {
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.RED, "There's no such pixelmon in your Pixelmon Bank.");
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.findNone));
             return;
         }
 
@@ -68,12 +67,11 @@ public class GetCmd {
         //Remove success
         if (SyncHandler.getInstance().delOne(player.getUuid().toString(), args[0])) {
             sStorage.add(pokemon);
-            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "Successfully get your " + pokemon.getDisplayName() + " from Pixelmon Bank!");
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successGetMsg, pokemon.getDisplayName()));
         }
 
         //Judge online and send success msg
 //        if (Optional.ofNullable(server.getPlayerList().getPlayerByUsername(sender.getName())).isPresent()) {
-//            CommandChatHandler.sendFormattedChat(sender, TextFormatting.GREEN, "You successfully send your " + pokemon.getDisplayName() + " to Pixelmon Bank!");
 //        }
 
     }

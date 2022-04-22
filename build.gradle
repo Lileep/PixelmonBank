@@ -30,7 +30,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0'
+version = '1.1'
 group = 'com.github.lileep' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'PixelmonBank'
 
@@ -79,10 +79,14 @@ shadowJar {
 
     configurations = [project.configurations.shadow]
 
+    relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
     relocate('com.google.gson', 'com.github.lileep.pixelmonbank.shade.gson')
     relocate('com.zaxxer', 'com.github.lileep.pixelmonbank.shade.hikari')
+    relocate('io.leangen.geantyref', 'com.github.lileep.pixelmonbank.shade.geantyref')
     relocate('org.slf4j', 'com.github.lileep.pixelmonbank.shade.slf4j')
-    relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
+    relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
+    relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
+    relocate('org.checkerframework', 'com.github.lileep.pixelmonbank.shade.checkerframework')
 
     exclude "**/module-info.class"
 }

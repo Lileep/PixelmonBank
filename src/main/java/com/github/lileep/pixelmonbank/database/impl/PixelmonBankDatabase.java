@@ -8,6 +8,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,11 +18,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class PixelmonBankDatabase implements Database {
 
-    private HikariDataSource hikari;
+    private final HikariDataSource hikari;
 
     public PixelmonBankDatabase() {
         this("pixelmon-bank-pool",
-                PixelmonBankConfig.DB_URL,
+                PixelmonBankConfig.DB_IP,
                 PixelmonBankConfig.DB_PORT,
                 PixelmonBankConfig.DB_USERNAME,
                 PixelmonBankConfig.DB_PASSWD,
@@ -30,7 +31,15 @@ public class PixelmonBankDatabase implements Database {
     }
 
     public PixelmonBankDatabase(String poolName, String ip, int port, String username, String password, String database) {
-        this(null, poolName, ip, port, username, password, database, "UTC", 30);
+        this(null,
+                poolName,
+                ip,
+                port,
+                username,
+                password,
+                database,
+                TimeZone.getDefault().getID(),
+                30);
     }
 
     public PixelmonBankDatabase(String connectionUrl, String poolName, String ip, int port, String username,
