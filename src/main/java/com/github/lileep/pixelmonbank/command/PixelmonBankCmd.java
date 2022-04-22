@@ -12,7 +12,9 @@ import net.minecraft.command.ICommandSender;
         value = "pixelmonbank",
         description = "/pixelmonbank <operation> [<slot>]",
         aliases = {
+                "pokemonbank",
                 "pixelbank",
+                "pokebank",
                 "pbank",
                 "pbk"
         }
@@ -28,7 +30,7 @@ import net.minecraft.command.ICommandSender;
 public class PixelmonBankCmd {
 
     private String getUsage() {
-        return "&c/pixelmonbank <" + PixelmonBankLocaleConfig.argOperation + "> [<" + PixelmonBankLocaleConfig.argSlot + ">]";
+        return "&c/pixelmonbank <" + PixelmonBankLocaleConfig.argOperation + "> [<" + PixelmonBankLocaleConfig.argParam + ">]";
     }
 
     @CommandProcessor
