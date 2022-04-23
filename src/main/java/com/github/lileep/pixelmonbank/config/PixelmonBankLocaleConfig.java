@@ -36,6 +36,9 @@ public class PixelmonBankLocaleConfig {
     public static String slotNumLimited = "&cSlot number must be between 1 and 6.";
     public static String nothing = "&cNothing is in that slot.";
     public static String partyLastOne = "&cYou must have more than one none egg Pokemon in your party to do this.";
+    public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
+    public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
+    public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
 
@@ -76,6 +79,9 @@ public class PixelmonBankLocaleConfig {
         slotNumLimited = config.get(category, "err-slot-number-limited", slotNumLimited).getString();
         nothing = config.get(category, "err-nothing", nothing).getString();
         partyLastOne = config.get(category, "err-party-last-one", partyLastOne).getString();
+        noLegendary = config.get(category, "err-no-legendary", noLegendary).getString();
+        noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
+        noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();
 

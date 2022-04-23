@@ -7,6 +7,7 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
@@ -14,9 +15,12 @@ import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.google.common.collect.Lists;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @Command(
@@ -72,6 +76,21 @@ public class SendCmd {
             if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
                 return;
+            }
+
+            //Check black lists
+            if (!PixelmonBankConfig.ALLOW_LEGENDARY && EnumSpecies.legendaries.contains(pokemon.getSpecies())) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noLegendary));
+                return;
+            } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
+                return;
+            } else {
+                List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
+                if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
+                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+                    return;
+                }
             }
 
             //retrieve all pixelmons
