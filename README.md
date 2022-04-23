@@ -1,4 +1,4 @@
- ![title img](https://github.com/Lileep/PixelmonBank/blob/dev/title.png)
+ ![title img](https://github.com/Lileep/PixelmonBank/blob/master/title.png)
 # PixelmonBank
 A forge based mod for transferring pixelmons from servers to databases.
 
