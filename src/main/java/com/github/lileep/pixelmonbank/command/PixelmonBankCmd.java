@@ -10,7 +10,6 @@ import net.minecraft.command.ICommandSender;
 
 @Command(
         value = "pixelmonbank",
-        description = "/pixelmonbank <operation> [<slot>]",
         aliases = {
                 "pokemonbank",
                 "pixelbank",
