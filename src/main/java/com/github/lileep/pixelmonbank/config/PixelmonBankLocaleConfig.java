@@ -19,7 +19,9 @@ public class PixelmonBankLocaleConfig {
     public static String cfgCategoryGeneral = "General settings for Pixelmon Bank";
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
-    public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank";
+    public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
+    public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
+    public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
 
     public static String cfgCategoryDB = "Database settings for Pixelmon Bank. Restart server to apply instead of reload";
     public static String cfgServerName = "Name of your server. Pixelmon Bank will make this a database field";
@@ -36,6 +38,10 @@ public class PixelmonBankLocaleConfig {
     public static String slotNumLimited = "&cSlot number must be between 1 and 6.";
     public static String nothing = "&cNothing is in that slot.";
     public static String partyLastOne = "&cYou must have more than one none egg Pokemon in your party to do this.";
+    public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
+    public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
+    public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
+    public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
 
@@ -49,7 +55,7 @@ public class PixelmonBankLocaleConfig {
     public static void loadConfig(final Configuration configuration) {
         String category = "locale";
         config = configuration;
-        cfgCategoryLocale = config.get(category, "cfg-category-locale", cfgCategoryLocale).getString();
+//        cfgCategoryLocale = config.get(category, "cfg-category-locale", cfgCategoryLocale).getString();
         config.addCustomCategoryComment(category, cfgCategoryLocale);
 
         prefix = config.get(category, "prefix", prefix).getString();
@@ -58,24 +64,30 @@ public class PixelmonBankLocaleConfig {
         argParam = config.get(category, "arg-param", argParam).getString();
         argSlot = config.get(category, "arg-slot", argSlot).getString();
 
-        cfgCategoryGeneral = config.get(category, "cfg-category-general", cfgCategoryGeneral).getString();
-        cfgAllowLegendary = config.get(category, "cfg-info-allow-legendary", cfgAllowLegendary).getString();
-        cfgAllowUltraBeast = config.get(category, "cfg-info-allow-ultrabeast", cfgAllowUltraBeast).getString();
-        cfgBlackList = config.get(category, "cfg-info-blacklist", cfgBlackList).getString();
-
-        cfgCategoryDB = config.get(category, "cfg-category-db", cfgCategoryDB).getString();
-        cfgServerName = config.get(category, "cfg-info-server-name", cfgServerName).getString();
-        cfgDBIP = config.get(category, "cfg-info-db-ip", cfgDBIP).getString();
-        cfgDBPort = config.get(category, "cfg-info-db-port", cfgDBPort).getString();
-        cfgDBName = config.get(category, "cfg-info-db-name", cfgDBName).getString();
-        cfgDBUsername = config.get(category, "cfg-info-db-username", cfgDBUsername).getString();
-        cfgDBPasswd = config.get(category, "cfg-info-db-passwd", cfgDBPasswd).getString();
+//        cfgCategoryGeneral = config.get(category, "cfg-category-general", cfgCategoryGeneral).getString();
+//        cfgAllowLegendary = config.get(category, "cfg-info-allow-legendary", cfgAllowLegendary).getString();
+//        cfgAllowUltraBeast = config.get(category, "cfg-info-allow-ultrabeast", cfgAllowUltraBeast).getString();
+//        cfgBlackList = config.get(category, "cfg-info-blacklist", cfgBlackList).getString();
+//        cfgMaxIvs = config.get(category, "cfg-info-max-ivs", cfgMaxIvs).getString();
+//        cfgCountHyperTrained = config.get(category, "cfg-info-count-hyper-trained", cfgCountHyperTrained).getString();
+//
+//        cfgCategoryDB = config.get(category, "cfg-category-db", cfgCategoryDB).getString();
+//        cfgServerName = config.get(category, "cfg-info-server-name", cfgServerName).getString();
+//        cfgDBIP = config.get(category, "cfg-info-db-ip", cfgDBIP).getString();
+//        cfgDBPort = config.get(category, "cfg-info-db-port", cfgDBPort).getString();
+//        cfgDBName = config.get(category, "cfg-info-db-name", cfgDBName).getString();
+//        cfgDBUsername = config.get(category, "cfg-info-db-username", cfgDBUsername).getString();
+//        cfgDBPasswd = config.get(category, "cfg-info-db-passwd", cfgDBPasswd).getString();
 
         playerOnly = config.get(category, "err-player-only", playerOnly).getString();
         slotNumInvalid = config.get(category, "err-slot-number-invalid", slotNumInvalid).getString();
         slotNumLimited = config.get(category, "err-slot-number-limited", slotNumLimited).getString();
         nothing = config.get(category, "err-nothing", nothing).getString();
         partyLastOne = config.get(category, "err-party-last-one", partyLastOne).getString();
+        noLegendary = config.get(category, "err-no-legendary", noLegendary).getString();
+        noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
+        noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
+        noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();
 

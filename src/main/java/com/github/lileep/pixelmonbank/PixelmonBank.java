@@ -14,9 +14,7 @@ import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.database.PixelmonBankQueries;
 import com.github.lileep.pixelmonbank.database.impl.PixelmonBankDatabase;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
-import com.github.lileep.pixelmonbank.lib.PixelmonReference;
 import com.github.lileep.pixelmonbank.lib.Reference;
-import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -54,7 +52,6 @@ public class PixelmonBank {
 
     @Mod.EventHandler
     public void init(final FMLInitializationEvent event) {
-        EnumSpecies.legendaries.forEach(species -> PixelmonReference.LEGENDARIES.add(species.getPokemonName()));
 
         UtilConcurrency.runAsync(() -> {
             this.database = new PixelmonBankDatabase();

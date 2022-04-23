@@ -1,6 +1,7 @@
 package com.github.lileep.pixelmonbank.config;
 
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
 import java.io.File;
 
@@ -9,8 +10,9 @@ public class PixelmonBankConfig {
 
     public static boolean ALLOW_LEGENDARY = true;
     public static boolean ALLOW_ULTRABEAST = true;
-
     public static String[] BLACK_LIST = new String[0];
+    public static int MAX_IVS = 6;
+    public static boolean COUNT_HYPER_TRAINED = false;
 
     public static String SERVER_NAME = "default_server";
     public static String LOCALE = "en_us";
@@ -23,8 +25,8 @@ public class PixelmonBankConfig {
     public static String DB_PASSWD = "root";
 
     //pre load
-    public static void loadLanguage(){
-        LOCALE = config.get("general", "language", LOCALE).getString();
+    public static void loadLanguage() {
+        LOCALE = config.get("general", "server_language", LOCALE, "Language of your server").getString();
     }
 
     public static void loadConfig(final String configurationPath) {
@@ -33,7 +35,7 @@ public class PixelmonBankConfig {
         config = configuration;
 
         loadLanguage();
-        LOCALE_OLD  = LOCALE;
+        LOCALE_OLD = LOCALE;
 
         //Load locale texts
         Configuration localeConfig = new Configuration(new File(configurationPath + "/locale", LOCALE + ".cfg"));
@@ -44,7 +46,7 @@ public class PixelmonBankConfig {
     }
 
     //post load
-    public static void loadConfig(){
+    public static void loadConfig() {
         String category = "general";
         config.addCustomCategoryComment(category, PixelmonBankLocaleConfig.cfgCategoryGeneral);
 
@@ -52,6 +54,18 @@ public class PixelmonBankConfig {
         config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).setComment(PixelmonBankLocaleConfig.cfgAllowLegendary);
         ALLOW_ULTRABEAST = config.get(category, "allow_ultrabeast", ALLOW_ULTRABEAST, PixelmonBankLocaleConfig.cfgAllowUltraBeast).getBoolean();
         BLACK_LIST = config.get(category, "black_list", BLACK_LIST, PixelmonBankLocaleConfig.cfgBlackList).getStringList();
+        for (int i = 0; i < BLACK_LIST.length; i++) {
+            BLACK_LIST[i] = BLACK_LIST[i].toLowerCase();
+        }
+
+        Property maxIvs = config.get(category, "max_ivs", MAX_IVS, PixelmonBankLocaleConfig.cfgMaxIvs);
+        if (maxIvs.getInt() > 6) {
+            maxIvs.set(6);
+        } else if (maxIvs.getInt() < 0) {
+            maxIvs.set(0);
+        }
+        MAX_IVS = maxIvs.getInt();
+        COUNT_HYPER_TRAINED = config.get(category, "count_hyper_trained", COUNT_HYPER_TRAINED, PixelmonBankLocaleConfig.cfgCountHyperTrained).getBoolean();
 
 
         category = "database";
