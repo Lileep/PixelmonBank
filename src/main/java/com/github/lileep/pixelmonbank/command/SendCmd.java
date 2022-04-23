@@ -15,6 +15,7 @@ import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.google.common.collect.Lists;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -89,6 +90,29 @@ public class SendCmd {
                 List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
                 if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
                     sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+                    return;
+                }
+            }
+
+            //Check ivs
+            if (PixelmonBankConfig.MAX_IVS < 6 && PixelmonBankConfig.MAX_IVS >= 0) {
+                int maxIVCount = 0;
+                //Count hyper trained
+                if (PixelmonBankConfig.COUNT_HYPER_TRAINED) {
+                    for (StatsType type : StatsType.getStatValues()) {
+                        if (pokemon.getIVs().isHyperTrained(type) || pokemon.getIVs().getStat(type) >= 31) {
+                            maxIVCount++;
+                        }
+                    }
+                } else {
+                    for (int iv : pokemon.getIVs().getArray()) {
+                        if (iv >= 31) {
+                            maxIVCount++;
+                        }
+                    }
+                }
+                if (maxIVCount > PixelmonBankConfig.MAX_IVS) {
+                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noMaxIVs, PixelmonBankConfig.MAX_IVS));
                     return;
                 }
             }
