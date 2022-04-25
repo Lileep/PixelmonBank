@@ -53,7 +53,7 @@ public class PixelmonBankGui {
                                     pokemon.getHeldItem().isEmpty() ? "" : (UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonHeld + " " + pokemon.getHeldItem().getDisplayName())),
                                     UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonIv + ": " + MsgHandler.formatStatusValue(pokemon.getIVs().getArray(), '|')),
                                     UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonEv + ": " + MsgHandler.formatStatusValue(pokemon.getEVs().getArray(), '|')),
-                                    UtilChatColour.translateColourCodes('&', "&d" + MsgHandler.formatMoves(pokemon.getMoveset().attacks, '|'))
+                                    UtilChatColour.translateColourCodes('&', "&d" + MsgHandler.formatMoves(pokemon.getMoveset(), '|'))
                             )
                             .build()
                     ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> {

@@ -2,7 +2,7 @@ package com.github.lileep.pixelmonbank.handler;
 
 import com.envyful.api.forge.chat.UtilChatColour;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
-import com.pixelmonmod.pixelmon.battles.attacks.Attack;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Moveset;
 import net.minecraft.util.text.TextComponentString;
 
 import java.util.Optional;
@@ -51,7 +51,7 @@ public class MsgHandler {
 
         StringBuilder b = new StringBuilder();
         for (int i = 0; ; i++) {
-            b.append(array[i]);
+            b.append(String.format("%3d", array[i]));
             if (i == iMax) {
                 return b.toString();
             }
@@ -62,21 +62,21 @@ public class MsgHandler {
     /**
      * Format a move set to a separated string
      *
-     * @param attacks   Move's attack array that needs to be formatted
+     * @param moveset   Move set that needs to be formatted
      * @param separator Array separator
      * @return Formatted move names
      */
-    public static String formatMoves(Attack[] attacks, char separator) {
-        if (!Optional.ofNullable(attacks).isPresent()) {
+    public static String formatMoves(Moveset moveset, char separator) {
+        if (!Optional.ofNullable(moveset).isPresent()) {
             return "(!)";
         }
-        int iMax = attacks.length - 1;
+        int iMax = moveset.size() - 1;
         if (iMax == -1) {
             return "";
         }
         StringBuilder b = new StringBuilder();
         for (int i = 0; ; i++) {
-            b.append(attacks[i].savedAttack.getLocalizedName());
+            b.append(moveset.attacks[i].getActualMove().getLocalizedName());
             if (i == iMax) {
                 return b.toString();
             }
