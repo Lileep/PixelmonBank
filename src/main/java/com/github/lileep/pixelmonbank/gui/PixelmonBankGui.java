@@ -14,7 +14,6 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,13 +32,13 @@ public class PixelmonBankGui {
                     .itemStack(new ItemBuilder(UtilSprite.getPixelmonSprite(pokemon))
                             .name(UtilChatColour.translateColourCodes('&', "&b" + pokemon.getLocalizedName() + (pokemon.isShiny() ? "&e★" : "")))
                             .addLore(
-                                    UtilChatColour.translateColourCodes('&', "&dlv: " + pokemon.getLevel() + " | dynamax lv:" + pokemon.getDynamaxLevel() + " " + (pokemon.hasGigantamaxFactor() ? " | can gigantamax" : "")),
-                                    UtilChatColour.translateColourCodes('&', "&dgender: " + pokemon.getGender().getLocalizedName() + " | caught ball: " + pokemon.getCaughtBall().getLocalizedName()),
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonLevel + ": " + pokemon.getLevel() + " | " + PixelmonBankLocaleConfig.pixelmonDynamaxLevel + ":" + pokemon.getDynamaxLevel() + " " + (pokemon.hasGigantamaxFactor() ? (" | " + PixelmonBankLocaleConfig.pixelmonCanGigantamax) : "")),
+                                    UtilChatColour.translateColourCodes('&', "&d" + pokemon.getGender().getLocalizedName() + " | " + pokemon.getCaughtBall().getLocalizedName()),
                                     UtilChatColour.translateColourCodes('&', (pokemon.getAbilitySlot() == 2 ? "&6" : "&d") + pokemon.getAbility().getLocalizedName() + "&d | " + pokemon.getNature().getLocalizedName() + (Optional.ofNullable(pokemon.getMintNature()).isPresent() ? (" -> &6" + pokemon.getMintNature().getLocalizedName()) : "")),
-                                    UtilChatColour.translateColourCodes('&', "&dHeld " + pokemon.getHeldItem().getDisplayName()),
-                                    UtilChatColour.translateColourCodes('&', "&div: " + MsgHandler.formatStatusValue(pokemon.getIVs().getArray(), '|')),
-                                    UtilChatColour.translateColourCodes('&', "&dev: " + MsgHandler.formatStatusValue(pokemon.getEVs().getArray(), '|')),
-                                    UtilChatColour.translateColourCodes('&', "&dmoves: " + MsgHandler.formatMoves(pokemon.getMoveset().attacks, '|'))
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonHeld + " " + pokemon.getHeldItem().getDisplayName()),
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonIv + ": " + MsgHandler.formatStatusValue(pokemon.getIVs().getArray(), '|')),
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonEv + ": " + MsgHandler.formatStatusValue(pokemon.getEVs().getArray(), '|')),
+                                    UtilChatColour.translateColourCodes('&', "&d" + MsgHandler.formatMoves(pokemon.getMoveset().attacks, '|'))
                             )
                             .build()
                     ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> {

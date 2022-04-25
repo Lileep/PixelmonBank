@@ -20,6 +20,8 @@ public class PixelmonBankLocaleConfig {
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
+    public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
+    public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
     public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
     public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
 
@@ -49,6 +51,13 @@ public class PixelmonBankLocaleConfig {
     public static String successGetMsg = "&aSuccessfully get your %s from Pixelmon Bank!";
     public static String successGetAllMsg = "&aSuccessfully get all of your pixelmons from Pixelmon Bank!";
     public static String successDeleteMsg = "&aSuccessfully delete %s's pixelmons in Pixelmon Bank.";
+
+    public static String pixelmonLevel = "lv";
+    public static String pixelmonDynamaxLevel = "dynamax lv";
+    public static String pixelmonCanGigantamax = "can gigantamax";
+    public static String pixelmonHeld = "held";
+    public static String pixelmonIv = "iv";
+    public static String pixelmonEv = "ev";
 
     public static String title = "&ePixelmon Bank";
 
@@ -99,6 +108,13 @@ public class PixelmonBankLocaleConfig {
         successGetMsg = config.get(category, "success-get", successGetMsg).getString();
         successGetAllMsg = config.get(category, "success-get-all", successGetAllMsg).getString();
         successDeleteMsg = config.get(category, "success-delete", successDeleteMsg).getString();
+
+        pixelmonLevel = config.get(category, "pixelmon-level", pixelmonLevel).getString();
+        pixelmonDynamaxLevel = config.get(category, "pixelmon-dynamax-level", pixelmonDynamaxLevel).getString();
+        pixelmonCanGigantamax = config.get(category, "pixelmon-can-gigantamax", pixelmonCanGigantamax).getString();
+        pixelmonHeld = config.get(category, "pixelmon-held", pixelmonHeld).getString();
+        pixelmonIv = config.get(category, "pixelmon-iv", pixelmonIv).getString();
+        pixelmonEv = config.get(category, "pixelmon-ev", pixelmonEv).getString();
 
         title = config.get(category, "title", title).getString();
 
