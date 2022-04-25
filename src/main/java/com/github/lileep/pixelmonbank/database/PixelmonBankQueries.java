@@ -27,8 +27,10 @@ public class PixelmonBankQueries {
     public static final String GET_ALL = "select pixelmon_data from `pixelmon_bank` where " +
             "player_uuid = ? and visible = 0";
 
-    public static final String GET_ALL_PAGEABLE = "select pixelmon_data from `pixelmon_bank` where " +
-            "player_uuid = ? and visible = 0 limit ?, ?";
+    //Use inner join to improve the efficiency
+    public static final String GET_ALL_PAGEABLE = "select pixelmon_data from `pixelmon_bank` as t1 join (" +
+            "select pixelmon_uuid from pixelmon_bank where player_uuid = ? and visible = 0 limit ?, ?" +
+            ") as t2 on t1.pixelmon_uuid = t2.pixelmon_uuid and t1.visible = 0";
 
     //Not hard delete
     public static final String DEL_ONE = "update `pixelmon_bank` set visible = 1 where " +

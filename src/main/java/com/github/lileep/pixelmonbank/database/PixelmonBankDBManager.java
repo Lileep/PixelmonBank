@@ -77,6 +77,27 @@ public class PixelmonBankDBManager {
         return packList;
     }
 
+    public List<DataPack> getAllPageable(String playerUUID, int pageStart, int pageSize) {
+        List<DataPack> packList = new ArrayList<>();
+        try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
+             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.GET_ALL_PAGEABLE)
+        ) {
+            statement.setString(1, playerUUID);
+            statement.setInt(2, pageStart);
+            statement.setInt(3, pageSize);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                InputStream stream = resultSet.getBlob(1).getBinaryStream();
+                if (stream != null) {
+                    packList.add(DataPack.toDataPack(stream));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return packList;
+    }
+
     public int delOne(String playerUUID, String pokemonUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.DEL_ONE)
