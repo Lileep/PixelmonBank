@@ -11,8 +11,7 @@ public class PixelmonBankQueries {
             "time_point     timestamp       not null    default     current_timestamp, " +
             "visible        tinyint         not null    default     0," +
             "index(player_uuid)," +
-            "unique(pixelmon_uuid)," +
-            "index(pixelmon_data)," +
+            "index(pixelmon_uuid)," +
             "index(time_point)," +
             "index(visible)" +
             ")Engine=InnoDB default charset=utf8mb4;";
