@@ -84,4 +84,8 @@ public class SyncHandler {
     public boolean delAll(String playerUUID) {
         return PixelmonBankDBManager.getInstance().delAll(playerUUID) > 0;
     }
+
+    public int count(String playerUUID) {
+        return PixelmonBankDBManager.getInstance().count(playerUUID);
+    }
 }
