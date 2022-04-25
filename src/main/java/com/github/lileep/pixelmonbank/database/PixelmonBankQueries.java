@@ -10,7 +10,7 @@ public class PixelmonBankQueries {
             "server_name    varchar(32), " +
             "time_point     timestamp       not null    default     current_timestamp, " +
             "visible        tinyint         not null    default     0," +
-            "index(uuid)," +
+            "index(player_uuid)," +
             "unique(pixelmon_uuid)," +
             "index(pixelmon_data)," +
             "index(time_point)," +
