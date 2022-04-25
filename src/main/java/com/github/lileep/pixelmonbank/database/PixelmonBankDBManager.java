@@ -122,4 +122,19 @@ public class PixelmonBankDBManager {
         }
         return 0;
     }
+
+    public int count(String playerUUID) {
+        try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
+             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.COUNT)
+        ) {
+            statement.setString(1, playerUUID);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }

@@ -38,4 +38,7 @@ public class PixelmonBankQueries {
 
     public static final String DEL_ALL = "update `pixelmon_bank` set visible = 1 where " +
             "player_uuid = ? and visible = 0";
+
+    public static final String COUNT = "select count(*) from `pixelmon_bank` where " +
+            "player_uuid = ? and visible = 0";
 }
