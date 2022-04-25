@@ -30,7 +30,7 @@ public class SyncHandler {
         serializers.remove(serializer.getUniqueName());
     }
 
-    public boolean sendOne(String playerUUID, String playerName, Pokemon pokemon) {
+    public boolean sendOne(String playerUUID, Pokemon pokemon) {
 
         //Prepare data
         DataPack dataPack = new DataPack();
@@ -41,7 +41,6 @@ public class SyncHandler {
         //Access db
         return PixelmonBankDBManager.getInstance().sendOne(
                 playerUUID,
-                playerName,
                 pokemon.getUUID().toString(),
                 dataPack
         ) > 0;

@@ -23,15 +23,14 @@ public class PixelmonBankDBManager {
         return instance;
     }
 
-    public int sendOne(String playerUUID, String playerName, String pokemonUUID, DataPack dataPack) {
+    public int sendOne(String playerUUID, String pokemonUUID, DataPack dataPack) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.SEND_ONE)
         ) {
             statement.setString(1, playerUUID);
-            statement.setString(2, playerName);
-            statement.setString(3, pokemonUUID);
-            statement.setBlob(4, dataPack.toStream());
-            statement.setString(5, PixelmonBankConfig.SERVER_NAME);
+            statement.setString(2, pokemonUUID);
+            statement.setBlob(3, dataPack.toStream());
+            statement.setString(4, PixelmonBankConfig.SERVER_NAME);
             return statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
