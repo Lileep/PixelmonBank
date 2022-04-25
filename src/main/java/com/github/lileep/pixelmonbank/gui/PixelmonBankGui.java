@@ -1,7 +1,9 @@
 package com.github.lileep.pixelmonbank.gui;
 
+import com.envyful.api.config.type.PositionableConfigItem;
 import com.envyful.api.forge.chat.UtilChatColour;
 import com.envyful.api.forge.concurrency.UtilForgeConcurrency;
+import com.envyful.api.forge.config.UtilConfigItem;
 import com.envyful.api.forge.items.ItemBuilder;
 import com.envyful.api.gui.factory.GuiFactory;
 import com.envyful.api.gui.pane.Pane;
@@ -10,8 +12,11 @@ import com.envyful.api.reforged.pixelmon.sprite.UtilSprite;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
@@ -19,7 +24,17 @@ import java.util.Optional;
 
 public class PixelmonBankGui {
 
-    public static void open(EnvyPlayer<EntityPlayerMP> player, List<Pokemon> pokemonList) {
+    private static final PositionableConfigItem previousPageButton = new PositionableConfigItem(
+            "pixelmon:trade_holder_left", 1, (byte) 0, PixelmonBankLocaleConfig.pbankGuiPrev,
+            Lists.newArrayList(), 0, 5, Maps.newHashMap()
+    );
+
+    private static final PositionableConfigItem nextPageButton = new PositionableConfigItem(
+            "pixelmon:trade_holder_right", 1, (byte) 0, PixelmonBankLocaleConfig.pbankGuiNext,
+            Lists.newArrayList(), 8, 5, Maps.newHashMap()
+    );
+
+    public static void open(EnvyPlayer<EntityPlayerMP> player, List<Pokemon> pokemonList, int page, int count) {
         Pane pane = GuiFactory.paneBuilder()
                 .topLeftY(0)
                 .topLeftX(0)
@@ -47,6 +62,28 @@ public class PixelmonBankGui {
                     }))
                     .build());
         }
+
+        if (page > 1) {
+            UtilConfigItem.addConfigItem(pane, previousPageButton, (envyPlayer, clickType) -> {
+                envyPlayer.executeCommands("pixelmonbank see " + (page - 1));
+            });
+        }
+
+        if (page < (count / 45 + 1)) {
+            UtilConfigItem.addConfigItem(pane, nextPageButton, (envyPlayer, clickType) -> {
+                envyPlayer.executeCommands("pixelmonbank see " + (page + 1));
+            });
+        }
+
+        pane.set(4, 5, GuiFactory.displayableBuilder(ItemStack.class)
+                .itemStack(new ItemBuilder(new ItemStack(Blocks.GOLD_BLOCK))
+                        .name(UtilChatColour.translateColourCodes('&', String.format(PixelmonBankLocaleConfig.pbankGuiInfo1, count)))
+                        .addLore(
+                                UtilChatColour.translateColourCodes('&', PixelmonBankLocaleConfig.pbankGuiInfo2)
+                        )
+                        .build()
+                ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> envyPlayer.executeCommands("pixelmonbank getall")))
+                .build());
 
         GuiFactory.guiBuilder()
                 .addPane(pane)

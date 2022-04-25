@@ -28,7 +28,12 @@ public class SeeCmd {
 
         EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
         //See logic
-        List<Pokemon> pokemonList = SyncHandler.getInstance().getAll(player.getUuid().toString());
-        PixelmonBankGui.open(player, pokemonList);
+        int pageNum = args.length < 1 ? 1 : Integer.parseInt(args[0]);
+        List<Pokemon> pokemonList = SyncHandler
+                .getInstance()
+                .getAllPageable(player.getUuid().toString(), pageNum, 45);
+
+        int count = SyncHandler.getInstance().count(player.getUuid().toString());
+        PixelmonBankGui.open(player, pokemonList, pageNum, count);
     }
 }
