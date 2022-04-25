@@ -86,7 +86,7 @@ public class SendCmd {
             } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
                 return;
-            } else {
+            } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
                 List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
                 if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
                     sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
