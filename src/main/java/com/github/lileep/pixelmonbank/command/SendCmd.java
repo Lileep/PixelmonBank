@@ -122,7 +122,7 @@ public class SendCmd {
 
             //Send logic
             EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
-            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), player.getName(), pokemon)) {
+            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), pokemon)) {
                 //Delete player's pixelmon
                 sStorage.set(slot - 1, null);
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
