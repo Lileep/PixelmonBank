@@ -13,7 +13,7 @@ public class PixelmonBankConfig {
     public static boolean ALLOW_EGG = false;
     public static String[] BLACK_LIST = new String[0];
     public static String[] BLACK_LIST_ITEM = new String[0];
-    public static String[] BLACK_LIST_MOVE = new String[0];
+//    public static String[] BLACK_LIST_MOVE = new String[0];
     public static int MAX_IVS = 6;
     public static boolean COUNT_HYPER_TRAINED = false;
 
@@ -64,10 +64,10 @@ public class PixelmonBankConfig {
         for (int i = 0; i < BLACK_LIST_ITEM.length; i++) {
             BLACK_LIST_ITEM[i] = BLACK_LIST_ITEM[i].toLowerCase();
         }
-        BLACK_LIST_MOVE = config.get(category, "black_list_move", BLACK_LIST_MOVE, PixelmonBankLocaleConfig.cfgBlackListMove).getStringList();
-        for (int i = 0; i < BLACK_LIST_MOVE.length; i++) {
-            BLACK_LIST_MOVE[i] = BLACK_LIST_MOVE[i].toLowerCase();
-        }
+//        BLACK_LIST_MOVE = config.get(category, "black_list_move", BLACK_LIST_MOVE, PixelmonBankLocaleConfig.cfgBlackListMove).getStringList();
+//        for (int i = 0; i < BLACK_LIST_MOVE.length; i++) {
+//            BLACK_LIST_MOVE[i] = BLACK_LIST_MOVE[i].toLowerCase().replaceAll("\\s*", "");
+//        }
 
         Property maxIvs = config.get(category, "max_ivs", MAX_IVS, PixelmonBankLocaleConfig.cfgMaxIvs);
         if (maxIvs.getInt() > 6) {

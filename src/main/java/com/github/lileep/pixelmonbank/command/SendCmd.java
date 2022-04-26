@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Command(
@@ -123,6 +124,25 @@ public class SendCmd {
                     return;
                 }
             }
+
+
+            //Check held item
+            if (PixelmonBankConfig.BLACK_LIST_ITEM.length > 0) {
+                List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST_ITEM);
+                if (blackList.contains(Objects.requireNonNull(pokemon.getHeldItem().getItem().getRegistryName()).toString())) {
+                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackListItem, pokemon.getHeldItem().getDisplayName()));
+                    return;
+                }
+            }
+
+//            sender.sendMessage(MsgHandler.prefixedColorMsg("has move? "+pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)));
+            //Check moves
+//            if (PixelmonBankConfig.BLACK_LIST_MOVE.length > 0) {
+//                if (pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)) {
+//                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+//                    return;
+//                }
+//            }
 
             //retrieve all pixelmons
             sStorage.retrieveAll();

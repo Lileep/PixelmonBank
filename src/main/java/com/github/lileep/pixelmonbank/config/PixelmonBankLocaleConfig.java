@@ -45,6 +45,7 @@ public class PixelmonBankLocaleConfig {
     public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
     public static String noEgg = "&cYou can't send pokemon eggs to Pixelmon Bank.";
     public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
+    public static String noBlackListItem = "&cItem %s is in black list, pixelmons holding this cannot be sent to Pixelmon Bank.";
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
@@ -104,6 +105,7 @@ public class PixelmonBankLocaleConfig {
         noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
         noEgg = config.get(category, "err-no-egg", noEgg).getString();
         noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
+        noBlackListItem = config.get(category, "err-no-blacklist-item", noBlackListItem).getString();
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();
