@@ -70,12 +70,19 @@ public class SendCmd {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
                 return;
             }
+            assert pokemon != null;
 
             //Judge admin bypass and whether the last pokemon in team is an egg
             final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
             if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
+                return;
+            }
+
+            //Check egg
+            if (pokemon.isEgg() && !PixelmonBankConfig.ALLOW_EGG) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noEgg));
                 return;
             }
 

@@ -10,6 +10,7 @@ public class PixelmonBankConfig {
 
     public static boolean ALLOW_LEGENDARY = true;
     public static boolean ALLOW_ULTRABEAST = true;
+    public static boolean ALLOW_EGG = false;
     public static String[] BLACK_LIST = new String[0];
     public static String[] BLACK_LIST_ITEM = new String[0];
     public static String[] BLACK_LIST_MOVE = new String[0];
@@ -53,8 +54,8 @@ public class PixelmonBankConfig {
         config.addCustomCategoryComment(category, PixelmonBankLocaleConfig.cfgCategoryGeneral);
 
         ALLOW_LEGENDARY = config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).getBoolean();
-        config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).setComment(PixelmonBankLocaleConfig.cfgAllowLegendary);
         ALLOW_ULTRABEAST = config.get(category, "allow_ultrabeast", ALLOW_ULTRABEAST, PixelmonBankLocaleConfig.cfgAllowUltraBeast).getBoolean();
+        ALLOW_EGG = config.get(category, "allow_egg", ALLOW_EGG, PixelmonBankLocaleConfig.cfgAllowEgg).getBoolean();
         BLACK_LIST = config.get(category, "black_list", BLACK_LIST, PixelmonBankLocaleConfig.cfgBlackList).getStringList();
         for (int i = 0; i < BLACK_LIST.length; i++) {
             BLACK_LIST[i] = BLACK_LIST[i].toLowerCase();

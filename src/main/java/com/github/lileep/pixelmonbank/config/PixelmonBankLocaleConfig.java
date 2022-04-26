@@ -19,6 +19,7 @@ public class PixelmonBankLocaleConfig {
     public static String cfgCategoryGeneral = "General settings for Pixelmon Bank";
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
+    public static String cfgAllowEgg = "Whether allow eggs beasts to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
@@ -42,6 +43,7 @@ public class PixelmonBankLocaleConfig {
     public static String partyLastOne = "&cYou must have more than one none egg Pokemon in your party to do this.";
     public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
     public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
+    public static String noEgg = "&cYou can't send pokemon eggs to Pixelmon Bank.";
     public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
@@ -100,6 +102,7 @@ public class PixelmonBankLocaleConfig {
         partyLastOne = config.get(category, "err-party-last-one", partyLastOne).getString();
         noLegendary = config.get(category, "err-no-legendary", noLegendary).getString();
         noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
+        noEgg = config.get(category, "err-no-egg", noEgg).getString();
         noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
