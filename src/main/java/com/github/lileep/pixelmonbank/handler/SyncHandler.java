@@ -30,7 +30,7 @@ public class SyncHandler {
         serializers.remove(serializer.getUniqueName());
     }
 
-    public boolean sendOne(String playerUUID, String playerName, Pokemon pokemon) {
+    public boolean sendOne(String playerUUID, Pokemon pokemon) {
 
         //Prepare data
         DataPack dataPack = new DataPack();
@@ -41,7 +41,6 @@ public class SyncHandler {
         //Access db
         return PixelmonBankDBManager.getInstance().sendOne(
                 playerUUID,
-                playerName,
                 pokemon.getUUID().toString(),
                 dataPack
         ) > 0;
@@ -69,11 +68,24 @@ public class SyncHandler {
         return pokemonList;
     }
 
+    public List<Pokemon> getAllPageable(String playerUUID, int pageNum, int pageSize) {
+        List<DataPack> dataPackList = PixelmonBankDBManager.getInstance().getAllPageable(playerUUID, (pageNum - 1) * pageSize, pageSize);
+        //Not necessary to judge null since db will return a new list
+        List<Pokemon> pokemonList = new ArrayList<>();
+        //If the list has no elements, for-each block will not be executed
+        dataPackList.forEach(dataPack -> pokemonList.add(serializers.get(Reference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0)));
+        return pokemonList;
+    }
+
     public boolean delOne(String playerUUID, String pokemonUUID) {
         return PixelmonBankDBManager.getInstance().delOne(playerUUID, pokemonUUID) > 0;
     }
 
-    public boolean delAll(String playerUUID){
+    public boolean delAll(String playerUUID) {
         return PixelmonBankDBManager.getInstance().delAll(playerUUID) > 0;
+    }
+
+    public int count(String playerUUID) {
+        return PixelmonBankDBManager.getInstance().count(playerUUID);
     }
 }

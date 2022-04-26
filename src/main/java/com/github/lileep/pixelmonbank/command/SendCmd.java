@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Command(
@@ -70,12 +71,19 @@ public class SendCmd {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
                 return;
             }
+            assert pokemon != null;
 
             //Judge admin bypass and whether the last pokemon in team is an egg
             final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
             if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
+                return;
+            }
+
+            //Check egg
+            if (pokemon.isEgg() && !PixelmonBankConfig.ALLOW_EGG) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noEgg));
                 return;
             }
 
@@ -86,7 +94,7 @@ public class SendCmd {
             } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
                 return;
-            } else {
+            } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
                 List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
                 if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
                     sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
@@ -117,12 +125,31 @@ public class SendCmd {
                 }
             }
 
+
+            //Check held item
+            if (PixelmonBankConfig.BLACK_LIST_ITEM.length > 0) {
+                List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST_ITEM);
+                if (blackList.contains(Objects.requireNonNull(pokemon.getHeldItem().getItem().getRegistryName()).toString())) {
+                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackListItem, pokemon.getHeldItem().getDisplayName()));
+                    return;
+                }
+            }
+
+//            sender.sendMessage(MsgHandler.prefixedColorMsg("has move? "+pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)));
+            //Check moves
+//            if (PixelmonBankConfig.BLACK_LIST_MOVE.length > 0) {
+//                if (pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)) {
+//                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+//                    return;
+//                }
+//            }
+
             //retrieve all pixelmons
             sStorage.retrieveAll();
 
             //Send logic
             EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
-            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), player.getName(), pokemon)) {
+            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), pokemon)) {
                 //Delete player's pixelmon
                 sStorage.set(slot - 1, null);
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));

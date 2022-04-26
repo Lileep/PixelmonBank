@@ -22,7 +22,7 @@ import java.io.File;
 public class ReloadCmd {
 
     @CommandProcessor
-    public void run(@Sender ICommandSender sender, String[] args) {
+    public void run(@Sender ICommandSender sender) {
         sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.configReloading));
         //load config
         final Configuration cfg = PixelmonBankConfig.config;

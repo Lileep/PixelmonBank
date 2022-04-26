@@ -27,7 +27,7 @@ import java.util.Optional;
 public class GetAllCmd {
 
     @CommandProcessor
-    public void run(@Sender EntityPlayerMP sender, String[] args) {
+    public void run(@Sender EntityPlayerMP sender) {
 
         //Test party
         PlayerPartyStorage sStorage;

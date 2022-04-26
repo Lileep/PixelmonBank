@@ -23,15 +23,14 @@ public class PixelmonBankDBManager {
         return instance;
     }
 
-    public int sendOne(String playerUUID, String playerName, String pokemonUUID, DataPack dataPack) {
+    public int sendOne(String playerUUID, String pokemonUUID, DataPack dataPack) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.SEND_ONE)
         ) {
             statement.setString(1, playerUUID);
-            statement.setString(2, playerName);
-            statement.setString(3, pokemonUUID);
-            statement.setBlob(4, dataPack.toStream());
-            statement.setString(5, PixelmonBankConfig.SERVER_NAME);
+            statement.setString(2, pokemonUUID);
+            statement.setBlob(3, dataPack.toStream());
+            statement.setString(4, PixelmonBankConfig.SERVER_NAME);
             return statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -78,6 +77,27 @@ public class PixelmonBankDBManager {
         return packList;
     }
 
+    public List<DataPack> getAllPageable(String playerUUID, int pageStart, int pageSize) {
+        List<DataPack> packList = new ArrayList<>();
+        try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
+             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.GET_ALL_PAGEABLE)
+        ) {
+            statement.setString(1, playerUUID);
+            statement.setInt(2, pageStart);
+            statement.setInt(3, pageSize);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                InputStream stream = resultSet.getBlob(1).getBinaryStream();
+                if (stream != null) {
+                    packList.add(DataPack.toDataPack(stream));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return packList;
+    }
+
     public int delOne(String playerUUID, String pokemonUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.DEL_ONE)
@@ -101,5 +121,20 @@ public class PixelmonBankDBManager {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public int count(String playerUUID) {
+        try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
+             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.COUNT)
+        ) {
+            statement.setString(1, playerUUID);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

@@ -19,7 +19,10 @@ public class PixelmonBankLocaleConfig {
     public static String cfgCategoryGeneral = "General settings for Pixelmon Bank";
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
+    public static String cfgAllowEgg = "Whether allow eggs to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
+    public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
+    public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
     public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
     public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
 
@@ -40,15 +43,29 @@ public class PixelmonBankLocaleConfig {
     public static String partyLastOne = "&cYou must have more than one none egg Pokemon in your party to do this.";
     public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
     public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
+    public static String noEgg = "&cYou can't send pokemon eggs to Pixelmon Bank.";
     public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
+    public static String noBlackListItem = "&cItem %s is in black list, pixelmons holding this cannot be sent to Pixelmon Bank.";
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
+    public static String pageInvalid = "&cPlease enter an integer as the page number.";
 
     public static String successSendMsg = "&aSuccessfully send your %s to Pixelmon Bank!";
     public static String successGetMsg = "&aSuccessfully get your %s from Pixelmon Bank!";
     public static String successGetAllMsg = "&aSuccessfully get all of your pixelmons from Pixelmon Bank!";
     public static String successDeleteMsg = "&aSuccessfully delete %s's pixelmons in Pixelmon Bank.";
+
+    public static String pixelmonLevel = "lv";
+    public static String pixelmonDynamaxLevel = "dynamax lv";
+    public static String pixelmonCanGigantamax = "can gigantamax";
+    public static String pixelmonHeld = "held";
+    public static String pixelmonIv = "iv";
+    public static String pixelmonEv = "ev";
+    public static String pbankGuiPrev = "&aPrevious Page";
+    public static String pbankGuiNext = "&aNext Page";
+    public static String pbankGuiInfo1 = "&eYou have a total of %d pixelmons in Pixelmon Bank";
+    public static String pbankGuiInfo2 = "&eClick here to retrieve all pixelmons from Bank";
 
     public static String title = "&ePixelmon Bank";
 
@@ -86,10 +103,13 @@ public class PixelmonBankLocaleConfig {
         partyLastOne = config.get(category, "err-party-last-one", partyLastOne).getString();
         noLegendary = config.get(category, "err-no-legendary", noLegendary).getString();
         noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
+        noEgg = config.get(category, "err-no-egg", noEgg).getString();
         noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
+        noBlackListItem = config.get(category, "err-no-blacklist-item", noBlackListItem).getString();
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();
+        pageInvalid = config.get(category, "err-page-invalid", pageInvalid).getString();
 
         configLoadFail = config.get(category, "config-load-fail", configLoadFail).getString();
         configLoadSuccess = config.get(category, "config-load-success", configLoadSuccess).getString();
@@ -99,6 +119,18 @@ public class PixelmonBankLocaleConfig {
         successGetMsg = config.get(category, "success-get", successGetMsg).getString();
         successGetAllMsg = config.get(category, "success-get-all", successGetAllMsg).getString();
         successDeleteMsg = config.get(category, "success-delete", successDeleteMsg).getString();
+
+        pixelmonLevel = config.get(category, "pixelmon-level", pixelmonLevel).getString();
+        pixelmonDynamaxLevel = config.get(category, "pixelmon-dynamax-level", pixelmonDynamaxLevel).getString();
+        pixelmonCanGigantamax = config.get(category, "pixelmon-can-gigantamax", pixelmonCanGigantamax).getString();
+        pixelmonHeld = config.get(category, "pixelmon-held", pixelmonHeld).getString();
+        pixelmonIv = config.get(category, "pixelmon-iv", pixelmonIv).getString();
+        pixelmonEv = config.get(category, "pixelmon-ev", pixelmonEv).getString();
+
+        pbankGuiPrev = config.get(category, "pbank-gui-prev", pbankGuiPrev).getString();
+        pbankGuiNext = config.get(category, "pbank-gui-next", pbankGuiNext).getString();
+        pbankGuiInfo1 = config.get(category, "pbank-gui-info-1", pbankGuiInfo1).getString();
+        pbankGuiInfo2 = config.get(category, "pbank-gui-info-2", pbankGuiInfo2).getString();
 
         title = config.get(category, "title", title).getString();
 
