@@ -55,7 +55,7 @@ public class MsgHandler {
             if (i == iMax) {
                 return b.toString();
             }
-            b.append(' ').append(separator).append(' ');
+            b.append(" &b").append(separator).append("&d ");
         }
     }
 
@@ -80,7 +80,7 @@ public class MsgHandler {
             if (i == iMax) {
                 return b.toString();
             }
-            b.append(' ').append(separator).append(' ');
+            b.append(" &b").append(separator).append("&d ");
         }
     }
 }
