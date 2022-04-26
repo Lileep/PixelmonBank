@@ -2,7 +2,9 @@ package com.github.lileep.pixelmonbank.handler;
 
 import com.envyful.api.forge.chat.UtilChatColour;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.IVStore;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Moveset;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
 import net.minecraft.util.text.TextComponentString;
 
 import java.util.Optional;
@@ -31,6 +33,34 @@ public class MsgHandler {
      */
     public static TextComponentString prefixedColorMsg(String msg, Object... args) {
         return prefixedColorMsg(String.format(msg, args));
+    }
+
+    /**
+     * Format an IVStore to a separated string
+     *
+     * @param ivs       IVStore that needs to be formatted
+     * @param separator iv separator
+     * @return Formatted string
+     */
+    public static String formatIV(IVStore ivs, char separator) {
+        if (!Optional.ofNullable(ivs).isPresent()) {
+            return "(!)";
+        }
+        StringBuilder b = new StringBuilder();
+        int i = 0;
+        for (StatsType type : StatsType.getStatValues()) {
+            if (ivs.isHyperTrained(type)) {
+                b.append(String.format("&6%3d", 31));
+            } else {
+                b.append(String.format("%3d", ivs.getStat(type)));
+            }
+            if (i == 5) {
+                return b.toString();
+            }
+            b.append(" &b").append(separator).append("&d ");
+            i++;
+        }
+        return b.toString();
     }
 
     /**

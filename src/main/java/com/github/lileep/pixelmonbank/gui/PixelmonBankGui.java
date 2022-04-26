@@ -51,7 +51,7 @@ public class PixelmonBankGui {
                                     UtilChatColour.translateColourCodes('&', "&d" + pokemon.getGender().getLocalizedName() + " | " + pokemon.getCaughtBall().getLocalizedName()),
                                     UtilChatColour.translateColourCodes('&', (pokemon.getAbilitySlot() == 2 ? "&6" : "&d") + pokemon.getAbility().getLocalizedName() + "&d | " + pokemon.getNature().getLocalizedName() + (Optional.ofNullable(pokemon.getMintNature()).isPresent() ? ("&6 -> " + pokemon.getMintNature().getLocalizedName()) : "")),
                                     pokemon.getHeldItem().isEmpty() ? "" : (UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonHeld + " " + pokemon.getHeldItem().getDisplayName())),
-                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonIv + ": " + MsgHandler.formatStatusValue(pokemon.getIVs().getArray(), '|')),
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonIv + ": " + MsgHandler.formatIV(pokemon.getIVs(), '|')),
                                     UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonEv + ": " + MsgHandler.formatStatusValue(pokemon.getEVs().getArray(), '|')),
                                     UtilChatColour.translateColourCodes('&', "&d" + MsgHandler.formatMoves(pokemon.getMoveset(), '|'))
                             )
