@@ -19,7 +19,7 @@ public class PixelmonBankLocaleConfig {
     public static String cfgCategoryGeneral = "General settings for Pixelmon Bank";
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
-    public static String cfgAllowEgg = "Whether allow eggs beasts to be sent to Pixelmon Bank";
+    public static String cfgAllowEgg = "Whether allow eggs to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
