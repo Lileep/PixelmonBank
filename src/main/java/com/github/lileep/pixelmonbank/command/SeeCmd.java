@@ -7,7 +7,9 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.gui.PixelmonBankGui;
+import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
@@ -28,7 +30,16 @@ public class SeeCmd {
 
         EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
         //See logic
-        int pageNum = args.length < 1 ? 1 : Integer.parseInt(args[0]);
+        int pageNum = 1;
+        if (args.length >= 1) {
+            try {
+                pageNum = Integer.parseInt(args[0]);
+            } catch (Exception e) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.pageInvalid));
+                return;
+            }
+        }
+
         List<Pokemon> pokemonList = SyncHandler
                 .getInstance()
                 .getAllPageable(player.getUuid().toString(), pageNum, 45);

@@ -46,6 +46,7 @@ public class PixelmonBankLocaleConfig {
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
+    public static String pageInvalid = "&cPlease enter an integer as the page number.";
 
     public static String successSendMsg = "&aSuccessfully send your %s to Pixelmon Bank!";
     public static String successGetMsg = "&aSuccessfully get your %s from Pixelmon Bank!";
@@ -103,6 +104,7 @@ public class PixelmonBankLocaleConfig {
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();
+        pageInvalid = config.get(category, "err-page-invalid", pageInvalid).getString();
 
         configLoadFail = config.get(category, "config-load-fail", configLoadFail).getString();
         configLoadSuccess = config.get(category, "config-load-success", configLoadSuccess).getString();
