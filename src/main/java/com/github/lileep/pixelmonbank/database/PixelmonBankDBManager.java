@@ -111,7 +111,7 @@ public class PixelmonBankDBManager {
         return 0;
     }
 
-    public int delAll(String playerUUID){
+    public int delAll(String playerUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.DEL_ALL)
         ) {

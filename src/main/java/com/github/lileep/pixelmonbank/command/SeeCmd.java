@@ -3,6 +3,7 @@ package com.github.lileep.pixelmonbank.command;
 import com.envyful.api.command.annotate.Child;
 import com.envyful.api.command.annotate.Command;
 import com.envyful.api.command.annotate.Permissible;
+import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
@@ -25,7 +26,7 @@ import java.util.List;
 public class SeeCmd {
 
     @CommandProcessor
-    public void run(@Sender EntityPlayerMP sender, String[] args) {
+    public void run(@Sender EntityPlayerMP sender, @Argument String[] args) {
         //See
 
         EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
@@ -34,7 +35,7 @@ public class SeeCmd {
         if (args.length >= 1) {
             try {
                 pageNum = Integer.parseInt(args[0]);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.pageInvalid));
                 return;
             }

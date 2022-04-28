@@ -33,7 +33,7 @@ public class PixelmonBankCmd {
     }
 
     @CommandProcessor
-    public void run(@Sender ICommandSender sender, String[] args) {
+    public void run(@Sender ICommandSender sender) {
         sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
     }
 }

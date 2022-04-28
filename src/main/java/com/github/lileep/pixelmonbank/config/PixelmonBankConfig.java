@@ -11,9 +11,10 @@ public class PixelmonBankConfig {
     public static boolean ALLOW_LEGENDARY = true;
     public static boolean ALLOW_ULTRABEAST = true;
     public static boolean ALLOW_EGG = false;
+    public static boolean ALLOW_UNTRADEABLE = false;
     public static String[] BLACK_LIST = new String[0];
     public static String[] BLACK_LIST_ITEM = new String[0];
-//    public static String[] BLACK_LIST_MOVE = new String[0];
+    //    public static String[] BLACK_LIST_MOVE = new String[0];
     public static int MAX_IVS = 6;
     public static boolean COUNT_HYPER_TRAINED = false;
 
@@ -56,6 +57,7 @@ public class PixelmonBankConfig {
         ALLOW_LEGENDARY = config.get(category, "allow_legendary", ALLOW_LEGENDARY, PixelmonBankLocaleConfig.cfgAllowLegendary).getBoolean();
         ALLOW_ULTRABEAST = config.get(category, "allow_ultrabeast", ALLOW_ULTRABEAST, PixelmonBankLocaleConfig.cfgAllowUltraBeast).getBoolean();
         ALLOW_EGG = config.get(category, "allow_egg", ALLOW_EGG, PixelmonBankLocaleConfig.cfgAllowEgg).getBoolean();
+        ALLOW_UNTRADEABLE = config.get(category, "allow_untradeable", ALLOW_UNTRADEABLE, PixelmonBankLocaleConfig.cfgAllowUntradeable).getBoolean();
         BLACK_LIST = config.get(category, "black_list", BLACK_LIST, PixelmonBankLocaleConfig.cfgBlackList).getStringList();
         for (int i = 0; i < BLACK_LIST.length; i++) {
             BLACK_LIST[i] = BLACK_LIST[i].toLowerCase();
@@ -77,7 +79,6 @@ public class PixelmonBankConfig {
         }
         MAX_IVS = maxIvs.getInt();
         COUNT_HYPER_TRAINED = config.get(category, "count_hyper_trained", COUNT_HYPER_TRAINED, PixelmonBankLocaleConfig.cfgCountHyperTrained).getBoolean();
-
 
 
         category = "database";
