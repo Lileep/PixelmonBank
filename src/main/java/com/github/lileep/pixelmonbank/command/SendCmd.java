@@ -3,6 +3,7 @@ package com.github.lileep.pixelmonbank.command;
 import com.envyful.api.command.annotate.Child;
 import com.envyful.api.command.annotate.Command;
 import com.envyful.api.command.annotate.Permissible;
+import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
@@ -37,7 +38,7 @@ public class SendCmd {
     }
 
     @CommandProcessor
-    public void run(@Sender EntityPlayerMP sender, String[] args) {
+    public void run(@Sender EntityPlayerMP sender, @Argument String[] args) {
 
         if (args.length < 1) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
