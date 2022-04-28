@@ -66,6 +66,7 @@ public class PixelmonBankLocaleConfig {
     public static String pixelmonEv = "ev";
     public static String pbankGuiPrev = "&aPrevious Page";
     public static String pbankGuiNext = "&aNext Page";
+    public static String pbankGuiGet = "&eClick here to retrieve this pixelmon";
     public static String pbankGuiInfo1 = "&eYou have a total of %d pixelmons in Pixelmon Bank";
     public static String pbankGuiInfo2 = "&eClick here to retrieve all pixelmons from Bank";
 
@@ -132,6 +133,7 @@ public class PixelmonBankLocaleConfig {
 
         pbankGuiPrev = config.get(category, "pbank-gui-prev", pbankGuiPrev).getString();
         pbankGuiNext = config.get(category, "pbank-gui-next", pbankGuiNext).getString();
+        pbankGuiGet = config.get(category, "pbank-gui-get", pbankGuiGet).getString();
         pbankGuiInfo1 = config.get(category, "pbank-gui-info-1", pbankGuiInfo1).getString();
         pbankGuiInfo2 = config.get(category, "pbank-gui-info-2", pbankGuiInfo2).getString();
 
