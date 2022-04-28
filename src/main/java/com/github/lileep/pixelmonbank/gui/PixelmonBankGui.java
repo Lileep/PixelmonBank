@@ -44,7 +44,7 @@ public class PixelmonBankGui {
                     .itemStack(new ItemBuilder(UtilSprite.getPixelmonSprite(pokemon))
                             .name(UtilChatColour.translateColourCodes('&', "&b" + pokemon.getLocalizedName() + (pokemon.isShiny() ? "&e★" : "")))
                             .lore(
-                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonLevel + ": " + pokemon.getLevel() + " &b|&d " + PixelmonBankLocaleConfig.pixelmonDynamaxLevel + ":" + pokemon.getDynamaxLevel() + " " + (pokemon.hasGigantamaxFactor() ? (" &b|&d " + PixelmonBankLocaleConfig.pixelmonCanGigantamax) : "")),
+                                    UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonLevel + ": " + pokemon.getLevel() + " &b|&d " + PixelmonBankLocaleConfig.pixelmonDynamaxLevel + ": " + pokemon.getDynamaxLevel() + " " + (pokemon.hasGigantamaxFactor() ? (" &b|&d " + PixelmonBankLocaleConfig.pixelmonCanGigantamax) : "")),
                                     UtilChatColour.translateColourCodes('&', "&d" + pokemon.getGender().getLocalizedName() + " &b|&d " + pokemon.getCaughtBall().getLocalizedName()),
                                     UtilChatColour.translateColourCodes('&', (pokemon.getAbilitySlot() == 2 ? "&6" : "&d") + pokemon.getAbility().getLocalizedName() + " &b|&d " + pokemon.getNature().getLocalizedName() + (Optional.ofNullable(pokemon.getMintNature()).isPresent() ? ("&6 -> " + pokemon.getMintNature().getLocalizedName()) : "")),
                                     pokemon.getHeldItem().isEmpty() ? "" : (UtilChatColour.translateColourCodes('&', "&d" + PixelmonBankLocaleConfig.pixelmonHeld + " " + pokemon.getHeldItem().getDisplayName())),
