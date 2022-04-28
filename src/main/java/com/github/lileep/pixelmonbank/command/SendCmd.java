@@ -73,76 +73,27 @@ public class SendCmd {
             }
             assert pokemon != null;
 
-            //Judge admin bypass and whether the last pokemon in team is an egg
+
+            //Check part
+            //Judge admin bypass
             final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
+            //Check untradeable
+            if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable") && !bypass) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
+                return;
+            }
+
+            //Check whether the last pokemon in team is an egg
             if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
                 return;
             }
 
-            //Check egg
-            if (pokemon.isEgg() && !PixelmonBankConfig.ALLOW_EGG) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noEgg));
+            //Check other things
+            if (!validatePixelmon(pokemon, sender)) {
                 return;
             }
-
-            //Check black lists
-            if (!PixelmonBankConfig.ALLOW_LEGENDARY && EnumSpecies.legendaries.contains(pokemon.getSpecies())) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noLegendary));
-                return;
-            } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
-                return;
-            } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
-                List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
-                if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
-                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
-                    return;
-                }
-            }
-
-            //Check ivs
-            if (PixelmonBankConfig.MAX_IVS < 6 && PixelmonBankConfig.MAX_IVS >= 0) {
-                int maxIVCount = 0;
-                //Count hyper trained
-                if (PixelmonBankConfig.COUNT_HYPER_TRAINED) {
-                    for (StatsType type : StatsType.getStatValues()) {
-                        if (pokemon.getIVs().isHyperTrained(type) || pokemon.getIVs().getStat(type) >= 31) {
-                            maxIVCount++;
-                        }
-                    }
-                } else {
-                    for (int iv : pokemon.getIVs().getArray()) {
-                        if (iv >= 31) {
-                            maxIVCount++;
-                        }
-                    }
-                }
-                if (maxIVCount > PixelmonBankConfig.MAX_IVS) {
-                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noMaxIVs, PixelmonBankConfig.MAX_IVS));
-                    return;
-                }
-            }
-
-
-            //Check held item
-            if (PixelmonBankConfig.BLACK_LIST_ITEM.length > 0) {
-                List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST_ITEM);
-                if (blackList.contains(Objects.requireNonNull(pokemon.getHeldItem().getItem().getRegistryName()).toString())) {
-                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackListItem, pokemon.getHeldItem().getDisplayName()));
-                    return;
-                }
-            }
-
-//            sender.sendMessage(MsgHandler.prefixedColorMsg("has move? "+pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)));
-            //Check moves
-//            if (PixelmonBankConfig.BLACK_LIST_MOVE.length > 0) {
-//                if (pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)) {
-//                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
-//                    return;
-//                }
-//            }
 
             //retrieve all pixelmons
             sStorage.retrieveAll();
@@ -158,5 +109,72 @@ public class SendCmd {
         } catch (NumberFormatException e) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumInvalid));
         }
+    }
+
+    private boolean validatePixelmon(Pokemon pokemon, EntityPlayerMP sender) {
+
+        //Check egg
+        if (pokemon.isEgg() && !PixelmonBankConfig.ALLOW_EGG) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noEgg));
+            return false;
+        }
+
+        //Check black lists
+        if (!PixelmonBankConfig.ALLOW_LEGENDARY && EnumSpecies.legendaries.contains(pokemon.getSpecies())) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noLegendary));
+            return false;
+        } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
+            return false;
+        } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
+            List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
+            if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+                return false;
+            }
+        }
+
+        //Check ivs
+        if (PixelmonBankConfig.MAX_IVS < 6 && PixelmonBankConfig.MAX_IVS >= 0) {
+            int maxIVCount = 0;
+            //Count hyper trained
+            if (PixelmonBankConfig.COUNT_HYPER_TRAINED) {
+                for (StatsType type : StatsType.getStatValues()) {
+                    if (pokemon.getIVs().isHyperTrained(type) || pokemon.getIVs().getStat(type) >= 31) {
+                        maxIVCount++;
+                    }
+                }
+            } else {
+                for (int iv : pokemon.getIVs().getArray()) {
+                    if (iv >= 31) {
+                        maxIVCount++;
+                    }
+                }
+            }
+            if (maxIVCount > PixelmonBankConfig.MAX_IVS) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noMaxIVs, PixelmonBankConfig.MAX_IVS));
+                return false;
+            }
+        }
+
+        //Check held item
+        if (PixelmonBankConfig.BLACK_LIST_ITEM.length > 0) {
+            List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST_ITEM);
+            if (blackList.contains(Objects.requireNonNull(pokemon.getHeldItem().getItem().getRegistryName()).toString())) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackListItem, pokemon.getHeldItem().getDisplayName()));
+                return false;
+            }
+        }
+
+//            sender.sendMessage(MsgHandler.prefixedColorMsg("has move? "+pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)));
+        //Check moves
+//            if (PixelmonBankConfig.BLACK_LIST_MOVE.length > 0) {
+//                if (pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)) {
+//                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+//                    return;
+//                }
+//            }
+
+        return true;
     }
 }

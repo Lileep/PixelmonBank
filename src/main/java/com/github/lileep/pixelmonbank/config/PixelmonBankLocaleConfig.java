@@ -20,6 +20,7 @@ public class PixelmonBankLocaleConfig {
     public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
     public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
     public static String cfgAllowEgg = "Whether allow eggs to be sent to Pixelmon Bank";
+    public static String cfgAllowUntradeable = "Whether allow untradeable pixelmons to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
@@ -40,10 +41,11 @@ public class PixelmonBankLocaleConfig {
     public static String slotNumInvalid = "&cInvalid slot number given.";
     public static String slotNumLimited = "&cSlot number must be between 1 and 6.";
     public static String nothing = "&cNothing is in that slot.";
-    public static String partyLastOne = "&cYou must have more than one none egg Pokemon in your party to do this.";
+    public static String partyLastOne = "&cYou must have more than one none egg pixelmon in your party to do this.";
     public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
     public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
-    public static String noEgg = "&cYou can't send pokemon eggs to Pixelmon Bank.";
+    public static String noEgg = "&cYou can't send pixelmon eggs to Pixelmon Bank.";
+    public static String noUntradeable = "&cYou can't send untradeable pixelmons to Pixelmon Bank.";
     public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
     public static String noBlackListItem = "&cItem %s is in black list, pixelmons holding this cannot be sent to Pixelmon Bank.";
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
@@ -104,6 +106,7 @@ public class PixelmonBankLocaleConfig {
         noLegendary = config.get(category, "err-no-legendary", noLegendary).getString();
         noUltrabeast = config.get(category, "err-no-ultrabeast", noUltrabeast).getString();
         noEgg = config.get(category, "err-no-egg", noEgg).getString();
+        noUntradeable = config.get(category, "err-no-untradeable", noUntradeable).getString();
         noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
         noBlackListItem = config.get(category, "err-no-blacklist-item", noBlackListItem).getString();
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
