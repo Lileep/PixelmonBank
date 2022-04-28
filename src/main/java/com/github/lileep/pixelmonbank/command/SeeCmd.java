@@ -35,7 +35,7 @@ public class SeeCmd {
         if (args.length >= 1) {
             try {
                 pageNum = Integer.parseInt(args[0]);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.pageInvalid));
                 return;
             }

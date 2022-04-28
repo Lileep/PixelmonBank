@@ -46,69 +46,71 @@ public class SendCmd {
         }
 
         //Send
+
+        //Slot must in 1-6
+        final int slot;
         try {
-
-            //Slot must in 1-6
-            final int slot = Integer.parseInt(args[0].replaceAll("[^0-9]", ""));
-            if (slot < 1 || slot > 6) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumLimited));
-                return;
-            }
-
-            //Get player storage
-            final PlayerPartyStorage sStorage;
-            if (Optional.ofNullable(Pixelmon.storageManager.getParty(sender)).isPresent()) {
-                sStorage = Pixelmon.storageManager.getParty(sender);
-            } else {
-                return;
-            }
-
-            //Get pokemon
-            final Pokemon pokemon;
-            if (Optional.ofNullable(sStorage.get(slot - 1)).isPresent()) {
-                pokemon = sStorage.get(slot - 1);
-            } else {
-                //Nothing in the slot
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
-                return;
-            }
-            assert pokemon != null;
-
-
-            //Check part
-            //Judge admin bypass
-            final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
-
-            //Check untradeable
-            if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable") && !bypass) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
-                return;
-            }
-
-            //Check whether the last pokemon in team is an egg
-            if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
-                return;
-            }
-
-            //Check other things
-            if (!validatePixelmon(pokemon, sender)) {
-                return;
-            }
-
-            //retrieve all pixelmons
-            sStorage.retrieveAll();
-
-            //Send logic
-            EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
-            if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), pokemon)) {
-                //Delete player's pixelmon
-                sStorage.set(slot - 1, null);
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
-            }
-
+            slot = Integer.parseInt(args[0]);
         } catch (NumberFormatException e) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumInvalid));
+            return;
+        }
+
+        if (slot < 1 || slot > 6) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.slotNumLimited));
+            return;
+        }
+
+        //Get player storage
+        final PlayerPartyStorage sStorage;
+        if (Optional.ofNullable(Pixelmon.storageManager.getParty(sender)).isPresent()) {
+            sStorage = Pixelmon.storageManager.getParty(sender);
+        } else {
+            return;
+        }
+
+        //Get pokemon
+        final Pokemon pokemon;
+        if (Optional.ofNullable(sStorage.get(slot - 1)).isPresent()) {
+            pokemon = sStorage.get(slot - 1);
+        } else {
+            //Nothing in the slot
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
+            return;
+        }
+        assert pokemon != null;
+
+
+        //Check part
+        //Judge admin bypass
+        final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
+
+        //Check untradeable
+        if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable") && !bypass) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
+            return;
+        }
+
+        //Check whether the last pokemon in team is an egg
+        if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
+            return;
+        }
+
+        //Check other things
+        if (!validatePixelmon(pokemon, sender)) {
+            return;
+        }
+
+        //retrieve all pixelmons
+        sStorage.retrieveAll();
+
+        //Send logic
+        EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
+        if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), pokemon)) {
+            //Delete player's pixelmon
+            sStorage.set(slot - 1, null);
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
         }
     }
 
