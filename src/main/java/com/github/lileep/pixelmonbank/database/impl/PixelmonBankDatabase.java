@@ -12,9 +12,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * Hikari SQL implementation of the {@link Database} interface
- *
  */
 public class PixelmonBankDatabase implements Database {
 
@@ -69,8 +67,8 @@ public class PixelmonBankDatabase implements Database {
         config.addDataSourceProperty("cacheServerConfiguration", true);
         config.addDataSourceProperty("elideSetAutoCommits", true);
         config.addDataSourceProperty("useLocalSessionState", true);
-        config.addDataSourceProperty("characterEncoding","utf8");
-        config.addDataSourceProperty("useUnicode","true");
+        config.addDataSourceProperty("characterEncoding", "utf8");
+        config.addDataSourceProperty("useUnicode", "true");
         config.addDataSourceProperty("maxLifetime", TimeUnit.SECONDS.toMillis(30));
         config.setConnectionTimeout(TimeUnit.SECONDS.toMillis(30));
         config.setLeakDetectionThreshold(TimeUnit.SECONDS.toMillis(60));

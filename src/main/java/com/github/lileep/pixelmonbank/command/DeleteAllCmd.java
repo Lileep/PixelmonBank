@@ -14,10 +14,8 @@ import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
-import com.pixelmonmod.pixelmon.comm.CommandChatHandler;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.text.TextFormatting;
 
 import java.util.Optional;
 
@@ -32,12 +30,12 @@ import java.util.Optional;
 public class DeleteAllCmd {
 
     @CommandProcessor
-    public void run(@Sender ICommandSender sender,  @Completable(PlayerTabCompleter.class) @Argument EntityPlayerMP target) {
+    public void run(@Sender ICommandSender sender, @Completable(PlayerTabCompleter.class) @Argument EntityPlayerMP target) {
         EnvyPlayer<EntityPlayerMP> targetPlayer = PixelmonBank.instance.getPlayerManager().getPlayer(target);
         if (!Optional.ofNullable(targetPlayer).isPresent()) {
             return;
         }
-        if (SyncHandler.getInstance().delAll(targetPlayer.getUuid().toString())){
+        if (SyncHandler.getInstance().delAll(targetPlayer.getUuid().toString())) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successDeleteMsg));
         }
 
