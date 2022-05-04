@@ -57,8 +57,12 @@ public class PixelmonBank {
             this.database = new PixelmonBankDatabase();
 
             try (Connection connection = this.database.getConnection();
-                 PreparedStatement preparedStatement = connection.prepareStatement(PixelmonBankQueries.CREATE_TABLE)) {
-                preparedStatement.executeUpdate();
+                 PreparedStatement createDB = connection.prepareStatement(PixelmonBankQueries.CREATE_DB);
+                 PreparedStatement createTable = connection.prepareStatement(PixelmonBankQueries.CREATE_TABLE)
+            ) {
+                createDB.setString(1, PixelmonBankConfig.DB_DBNAME);
+                createDB.executeUpdate();
+                createTable.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

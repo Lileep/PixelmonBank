@@ -2,6 +2,8 @@ package com.github.lileep.pixelmonbank.database;
 
 public class PixelmonBankQueries {
 
+    public static final String CREATE_DB = "create database if not exists ?;";
+
     //visible: 0: can be seen, 1: cannot be seen
     public static final String CREATE_TABLE = "create table if not exists `pixelmon_bank`(" +
             "player_uuid    varchar(64)     not null, " +
