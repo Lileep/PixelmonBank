@@ -25,7 +25,7 @@ public class PixelmonBankDBManager {
 
     public int sendOne(String playerUUID, String pokemonUUID, DataPack dataPack) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.SEND_ONE)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SEND_ONE, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setString(2, pokemonUUID);
@@ -41,7 +41,7 @@ public class PixelmonBankDBManager {
     public DataPack getOne(String playerUUID, String pokemonUUID) {
         DataPack pack = null;
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.GET_ONE)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ONE, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setString(2, pokemonUUID);
@@ -61,7 +61,7 @@ public class PixelmonBankDBManager {
     public List<DataPack> getAll(String playerUUID) {
         List<DataPack> packList = new ArrayList<>();
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.GET_ALL)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             ResultSet resultSet = statement.executeQuery();
@@ -80,7 +80,7 @@ public class PixelmonBankDBManager {
     public List<DataPack> getAllPageable(String playerUUID, int pageStart, int pageSize) {
         List<DataPack> packList = new ArrayList<>();
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.GET_ALL_PAGEABLE)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL_PAGEABLE, PixelmonBankConfig.DB_DBNAME, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setInt(2, pageStart);
@@ -100,7 +100,7 @@ public class PixelmonBankDBManager {
 
     public int delOne(String playerUUID, String pokemonUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.DEL_ONE)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.DEL_ONE, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setString(2, pokemonUUID);
@@ -113,7 +113,7 @@ public class PixelmonBankDBManager {
 
     public int delAll(String playerUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.DEL_ALL)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.DEL_ALL, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             return statement.executeUpdate();
@@ -125,7 +125,7 @@ public class PixelmonBankDBManager {
 
     public int count(String playerUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(PixelmonBankQueries.COUNT)
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.COUNT, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             ResultSet resultSet = statement.executeQuery();
