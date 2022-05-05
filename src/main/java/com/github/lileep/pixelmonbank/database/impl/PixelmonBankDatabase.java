@@ -50,12 +50,12 @@ public class PixelmonBankDatabase implements Database {
 
         config.setJdbcUrl(Optional
                 .ofNullable(connectionUrl)
-                .orElse("jdbc:mysql://" + ip + ":" + port + "/" + database + "?characterEncoding=UTF-8&serverTimezone=" + timezone)
+                .orElse("jdbc:mysql://" + ip + ":" + port + "/?characterEncoding=UTF-8&serverTimezone=" + timezone)
         );
 
         config.addDataSourceProperty("serverName", ip);
         config.addDataSourceProperty("port", port);
-        config.addDataSourceProperty("databaseName", database);
+//        config.addDataSourceProperty("databaseName", database);
         config.addDataSourceProperty("user", username);
         config.addDataSourceProperty("password", password);
         config.addDataSourceProperty("cachePrepStmts", true);

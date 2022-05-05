@@ -2,10 +2,10 @@ package com.github.lileep.pixelmonbank.database;
 
 public class PixelmonBankQueries {
 
-    public static final String CREATE_DB = "create database if not exists ?;";
+    public static final String CREATE_DB = "create database if not exists %s;";
 
     //visible: 0: can be seen, 1: cannot be seen
-    public static final String CREATE_TABLE = "create table if not exists `pixelmon_bank`(" +
+    public static final String CREATE_TABLE = "create table if not exists `%s`.`pixelmon_bank`(" +
             "player_uuid    varchar(64)     not null, " +
             "pixelmon_uuid  varchar(64)     not null, " +
             "pixelmon_data  BLOB            not null, " +
@@ -18,28 +18,28 @@ public class PixelmonBankQueries {
             "index(visible)" +
             ")Engine=InnoDB default charset=utf8mb4;";
 
-    public static final String SEND_ONE = "insert into `pixelmon_bank` " +
+    public static final String SEND_ONE = "insert into `%s`.`pixelmon_bank` " +
             "(player_uuid, pixelmon_uuid, pixelmon_data, server_name, time_point, visible) " +
             "values (?, ?, ?, ?, NOW(), default)";
 
-    public static final String GET_ONE = "select pixelmon_data from `pixelmon_bank` where " +
+    public static final String GET_ONE = "select pixelmon_data from `%s`.`pixelmon_bank` where " +
             "player_uuid = ? and pixelmon_uuid = ? and visible = 0";
 
-    public static final String GET_ALL = "select pixelmon_data from `pixelmon_bank` where " +
+    public static final String GET_ALL = "select pixelmon_data from `%s`.`pixelmon_bank` where " +
             "player_uuid = ? and visible = 0";
 
     //Use inner join to improve the efficiency
-    public static final String GET_ALL_PAGEABLE = "select pixelmon_data from `pixelmon_bank` as t1 join (" +
-            "select pixelmon_uuid from pixelmon_bank where player_uuid = ? and visible = 0 limit ?, ?" +
+    public static final String GET_ALL_PAGEABLE = "select pixelmon_data from `%s`.`pixelmon_bank` as t1 join (" +
+            "select pixelmon_uuid from `%s`.`pixelmon_bank` where player_uuid = ? and visible = 0 limit ?, ?" +
             ") as t2 on t1.pixelmon_uuid = t2.pixelmon_uuid and t1.visible = 0";
 
     //Not hard delete
-    public static final String DEL_ONE = "update `pixelmon_bank` set visible = 1 where " +
+    public static final String DEL_ONE = "update `%s`.`pixelmon_bank` set visible = 1 where " +
             "player_uuid = ? and pixelmon_uuid = ?";
 
-    public static final String DEL_ALL = "update `pixelmon_bank` set visible = 1 where " +
+    public static final String DEL_ALL = "update `%s`.`pixelmon_bank` set visible = 1 where " +
             "player_uuid = ? and visible = 0";
 
-    public static final String COUNT = "select count(*) from `pixelmon_bank` where " +
+    public static final String COUNT = "select count(*) from `%s`.`pixelmon_bank` where " +
             "player_uuid = ? and visible = 0";
 }
