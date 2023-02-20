@@ -17,15 +17,16 @@ public class PixelmonBankLocaleConfig {
     public static String configReloading = "&7Reloading config...";
 
     public static String cfgCategoryGeneral = "General settings for Pixelmon Bank";
-    public static String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
-    public static String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
-    public static String cfgAllowEgg = "Whether allow eggs to be sent to Pixelmon Bank";
-    public static String cfgAllowUntradeable = "Whether allow untradeable pixelmons to be sent to Pixelmon Bank";
+    public static String cfgAllowLegendary = "Whether to allow legendaries to be sent to Pixelmon Bank";
+    public static String cfgAllowUltraBeast = "Whether to allow ultra beasts to be sent to Pixelmon Bank";
+    public static String cfgAllowEgg = "Whether to allow eggs to be sent to Pixelmon Bank";
+    public static String cfgAllowUntradeable = "Whether to allow untradeable pixelmons to be sent to Pixelmon Bank";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
     public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
     public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
+    public static String cfgOverridePaletteWithCT = "Whether to use CustomTexture as palette while sending and use palette as CustomTexture while retrieving to become compatible with 1.16. DO NOT set to true if you don't exactly know what does this mean.";
 
     public static String cfgCategoryDB = "Database settings for Pixelmon Bank. Restart server to apply instead of reload";
     public static String cfgServerName = "Name of your server. Pixelmon Bank will make this a database field";
