@@ -1,11 +1,11 @@
 package com.github.lileep.pixelmonbank.data.serializer;
 
+import com.github.lileep.pixelmonbank.data.bean.PokemonBean;
 import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.lib.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,7 +25,10 @@ public class PixelmonSerializer implements ISerializer {
     @Override
     public String serialize(Pokemon pokemon) {
         Map<String, String> data = new HashMap<>(1);
-        data.put(pokemon.getUUID().toString(), pokemon.writeToNBT(new NBTTagCompound()).toString());
+        Pokemon pokemonBean = new PokemonBean(pokemon.getUUID());
+        pokemonBean.readFromNBT(pokemon.writeToNBT(new NBTTagCompound()));
+        //TODO: Deal with nbt compound without considering pokemon uuid. Abstract it.
+        data.put(pokemon.getUUID().toString(), pokemonBean.writeToNBT(new NBTTagCompound()).toString());
         return GSON.toJson(data, TYPE);
     }
 
@@ -53,7 +56,11 @@ public class PixelmonSerializer implements ISerializer {
             NBTTagCompound nbtTagCompound;
             try {
                 nbtTagCompound = JsonToNBT.getTagFromJson(map.get(key));
-                pokemonList.add(Pixelmon.pokemonFactory.create(nbtTagCompound));
+
+                PokemonBean pokemonBean = new PokemonBean((nbtTagCompound.getUniqueId("UUID")));
+                pokemonBean.readFromNBT(nbtTagCompound);
+//                pokemonList.add(Pixelmon.pokemonFactory.create(nbtTagCompound));
+                pokemonList.add(pokemonBean);
             } catch (Exception e) {
                 System.out.println("Failed to write nbt.");
                 return null;
