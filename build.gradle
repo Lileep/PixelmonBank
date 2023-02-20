@@ -26,12 +26,9 @@ allprojects {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: "com.github.johnrengelman.shadow"
-// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 
-version = '1.4'
-group = 'com.github.lileep' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+version = '1.4.1'
+group = 'com.github.lileep'
 archivesBaseName = 'PixelmonBank'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -54,11 +51,11 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-    compile files('libs/Pixelmon-1.12.2-8.3.8-universal.jar')
+    compile files('libs/Pixelmon-1.12.2-8.4.3-universal.jar')
 
-    shadow group: 'com.github.Pixelmon-Development.API', name: 'commons', version: '2.0.4'
-    shadow group: 'com.github.Pixelmon-Development.API', name: 'forge', version: '2.0.4'
-    shadow group: 'com.github.Pixelmon-Development.API', name: 'reforged', version: '2.0.4'
+    shadow group: 'com.github.Pixelmon-Development.API', name: 'commons', version: '2.3.0'
+    shadow group: 'com.github.Pixelmon-Development.API', name: 'forge', version: '2.3.0'
+    shadow group: 'com.github.Pixelmon-Development.API', name: 'reforged', version: '2.3.0'
 }
 
 jar {
@@ -97,24 +94,7 @@ reobf {
     }
 }
 
-// Example configuration to allow publishing using the maven-publish task
-// This is the preferred method to reobfuscate your jar file
 jar.finalizedBy('reobfJar')
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
-//publish.dependsOn('reobfJar')
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
-        }
-    }
-}
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
