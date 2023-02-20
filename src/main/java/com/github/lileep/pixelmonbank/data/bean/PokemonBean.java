@@ -1,5 +1,6 @@
-package com.github.lileep.pixelmonbank.bean;
+package com.github.lileep.pixelmonbank.data.bean;
 
+import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.RandomHelper;
 import com.pixelmonmod.pixelmon.api.moveskills.MoveSkill;
@@ -23,6 +24,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Tuple;
@@ -30,24 +32,30 @@ import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class PokemonBean extends Pokemon {
+
+    public PokemonBean(UUID uuid) {
+        super(uuid);
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         if (nbt.hasKey("ndex")) {
             this.dsSpecies.set(this, nbt.getInteger("ndex"));
-        } else if (nbt.hasKey("Name")) {
-            this.dsSpecies.set(this, EnumSpecies.getFromName(nbt.getString("Name")).orElse(EnumSpecies.MissingNo).getNationalPokedexInteger());
+        } else if (nbt.hasKey(NbtKeys.NAME)) {
+            this.dsSpecies.set(this, EnumSpecies.getFromName(nbt.getString(NbtKeys.NAME)).orElse(EnumSpecies.MissingNo).getNationalPokedexInteger());
         }
 
-        if (nbt.hasKey("Variant")) {
-            this.dsForm.set(this, nbt.getByte("Variant"));
+        if (nbt.hasKey(NbtKeys.FORM)) {
+            this.dsForm.set(this, nbt.getByte(NbtKeys.FORM));
         }
 
-        if (nbt.hasKey("Gender")) {
-            this.dsGender.set(this, nbt.getByte("Gender"));
+        if (nbt.hasKey(NbtKeys.GENDER)) {
+            this.dsGender.set(this, nbt.getByte(NbtKeys.GENDER));
         }
 
         if (this.species == EnumSpecies.MissingNo) {
@@ -57,49 +65,50 @@ public class PokemonBean extends Pokemon {
         int NBT_VERSION = nbt.getByte("NBT_VERSION");
         this.setUUID(nbt.getUniqueId(NbtKeys.UUID));
         this.setShiny(nbt.getBoolean(NbtKeys.IS_SHINY));
-//        byte special = nbt.getByte("Form");
 
-        String special = nbt.getString(NbtKeys.SPECIAL_TEXTURE);
-        //TODO: Test ashen and strike forms
+        //Compatible with previous versions
+        byte special = nbt.getByte("Form");
         switch (special) {
-            case "roasted":
+            case 1:
                 this.dsForm.set(this, EnumMagikarp.ROASTED.getForm());
                 break;
-            case "zombie":
+            case 2:
                 this.dsForm.set(this, EnumSpecial.Zombie.getForm());
                 break;
-            case "online":
+            case 3:
                 this.dsForm.set(this, EnumSpecial.Online.getForm());
                 break;
-            case "drowned":
+            case 4:
                 this.dsForm.set(this, EnumSpecial.Drowned.getForm());
                 break;
-            case "valentine":
+            case 5:
                 this.dsForm.set(this, EnumSpecial.Valentine.getForm());
                 break;
-            case "rainbow":
+            case 6:
                 this.dsForm.set(this, EnumSpecial.Rainbow.getForm());
                 break;
-            case "alien":
+            case 7:
                 this.dsForm.set(this, EnumSpecial.Alien.getForm());
                 break;
-            case "real":
+            case 8:
                 this.dsForm.set(this, EnumSolgaleo.Real.getForm());
                 break;
-            case "alter":
+            case 9:
                 this.dsForm.set(this, EnumSpecial.Alter.getForm());
                 break;
-            case "pink":
+            case 10:
                 this.dsForm.set(this, EnumSpecial.Pink.getForm());
                 break;
-            case "summer":
+            case 11:
                 this.dsForm.set(this, EnumSpecial.Summer.getForm());
                 break;
-            case "crystal":
+            case 12:
                 this.dsForm.set(this, EnumSpecial.Crystal.getForm());
+                break;
         }
 
-        this.setCustomTexture(nbt.getString(NbtKeys.CUSTOM_TEXTURE));
+        this.setCustomTexture(nbt.getString(PixelmonBankConfig.OVERRIDE_PALETTE_WITH_CT ?
+                "palette" : NbtKeys.CUSTOM_TEXTURE));
         this.setNickname(nbt.getString(NbtKeys.NICKNAME));
         this.setCaughtBall(nbt.hasKey(NbtKeys.CAUGHT_BALL) ? EnumPokeballs.getFromIndex(nbt.getByte(NbtKeys.CAUGHT_BALL)) : EnumPokeballs.PokeBall);
         this.setNature(EnumNature.getNatureFromIndex(nbt.getByte(NbtKeys.NATURE)));
@@ -291,9 +300,125 @@ public class PokemonBean extends Pokemon {
     //1.12: com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        return super.writeToNBT(nbt);
+        nbt.setShort("ndex", (short) this.species.getNationalPokedexInteger());
+        //TODO: 1.16.5 compatible
+        int form = this.getFormEnum().isTemporary() ? this.getFormEnum().getDefaultFromTemporary(this).getForm() : this.getForm();
+        nbt.setByte(NbtKeys.FORM, (byte) form);
+        nbt.setByte(NbtKeys.GENDER, (byte) this.getGender().ordinal());
+        nbt.setByte("NBT_VERSION", (byte) 1);
+        nbt.setUniqueId(NbtKeys.UUID, this.uuid);
+        nbt.setBoolean(NbtKeys.IS_SHINY, this.isShiny);
+        if (!this.customTexture.isEmpty()) {
+            nbt.setString(PixelmonBankConfig.OVERRIDE_PALETTE_WITH_CT ?
+                            "palette" : NbtKeys.CUSTOM_TEXTURE,
+                    this.customTexture);
+        } else {
+            nbt.removeTag(NbtKeys.CUSTOM_TEXTURE);
+        }
+        if (this.nickname != null && !this.nickname.isEmpty() && !Objects.equals(this.nickname, this.species.name)) {
+            nbt.setString(NbtKeys.NICKNAME, this.nickname);
+        } else {
+            nbt.removeTag(NbtKeys.NICKNAME);
+        }
+        if (this.caughtBall != null) {
+            nbt.setByte(NbtKeys.CAUGHT_BALL, (byte) this.caughtBall.ordinal());
+        } else {
+            nbt.removeTag(NbtKeys.CAUGHT_BALL);
+        }
+        nbt.setByte(NbtKeys.NATURE, (byte) this.nature.index);
+        if (this.mintNature != null) {
+            nbt.setByte(NbtKeys.MINT_NATURE, (byte) this.mintNature.index);
+        }
+        nbt.setByte(NbtKeys.GROWTH, (byte) this.growth.index);
+        if (this.eggCycles != null) {
+            nbt.setInteger(NbtKeys.EGG_CYCLES, this.eggCycles);
+            nbt.setInteger(NbtKeys.STEPS, getEggSteps());
+        } else {
+            nbt.removeTag(NbtKeys.EGG_CYCLES);
+        }
+        if (this.originalTrainerName != null && !this.originalTrainerName.isEmpty()) {
+            nbt.setString(NbtKeys.ORIGINAL_TRAINER, this.originalTrainerName);
+        } else {
+            nbt.removeTag(NbtKeys.ORIGINAL_TRAINER);
+        }
+        if (this.originalTrainerUUID != null) {
+            nbt.setUniqueId(NbtKeys.ORIGINAL_TRAINER_UUID, this.originalTrainerUUID);
+        } else {
+            nbt.removeTag(NbtKeys.ORIGINAL_TRAINER_UUID);
+        }
+        nbt.setInteger(NbtKeys.LEVEL, this.level);
+        nbt.setInteger(NbtKeys.DYNAMAX_LEVEL, this.dynamaxLevel);
+        nbt.setBoolean(NbtKeys.GIGANTAMAX_FACTOR, this.gigantamaxFactor);
+        nbt.setInteger(NbtKeys.EXP, this.experience);
+        nbt.setBoolean(NbtKeys.DOES_LEVEL, this.doesLevel);
+        nbt.setBoolean(NbtKeys.IS_IN_RANCH, this.inRanch);
+        nbt.setShort(NbtKeys.FRIENDSHIP, (short) this.friendship);
+
+        this.moveset.writeToNBT(nbt);
+        this.stats.writeToNBT(nbt);
+        this.bonusStats.writeToNBT(nbt);
+
+        //Special processing of defence → defense
+        defenceTo1165(nbt);
+
+        nbt.setInteger(NbtKeys.HEALTH, this.health);
+        if (getExtraStats() != null) {
+            this.extraStats.writeToNBT(nbt);
+        }
+        if (this.abilitySlot != -1) {
+            nbt.setByte(NbtKeys.ABILITY_SLOT, (byte) this.abilitySlot);
+        } else if (this.ability != null) {
+            String abilityName = getAbilityName();
+            nbt.setString("Ability", abilityName);
+        }
+        if (this.pokerus != null) {
+            nbt.setTag(NbtKeys.POKERUS, this.pokerus.serializeToNBT());
+        }
+        this.status.writeToNBT(nbt);
+        if (this.heldItem != null && !this.heldItem.isEmpty()) {
+            nbt.setTag(NbtKeys.HELD_ITEM_STACK, this.heldItem.writeToNBT(new NBTTagCompound()));
+        } else {
+            nbt.removeTag(NbtKeys.HELD_ITEM_STACK);
+        }
+        nbt.setTag("PersistentData", this.persistentData);
+        if (!this.relearnableMoves.isEmpty()) {
+            int[] relearnableMoves = new int[this.relearnableMoves.size()];
+            for (int i = 0; i < this.relearnableMoves.size(); i++) {
+                relearnableMoves[i] = this.relearnableMoves.get(i);
+            }
+            nbt.setIntArray(NbtKeys.RELEARNABLE_MOVES, relearnableMoves);
+        }
+        NBTTagCompound moveSkillCooldowns = new NBTTagCompound();
+        long cur = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0].getTotalWorldTime();
+        for (Map.Entry<String, Tuple<Long, Long>> entry : this.moveSkillCooldownData.entrySet()) {
+            if (entry.getValue().getSecond() >= cur) {
+                moveSkillCooldowns.setUniqueId(entry.getKey(), new UUID(entry.getValue().getFirst(), entry.getValue().getSecond()));
+            }
+        }
+        if (moveSkillCooldowns.getSize() != 0) {
+            nbt.setTag(NbtKeys.MOVE_SKILL_COOLDOWNS, moveSkillCooldowns);
+        }
+        NBTTagList specList = new NBTTagList();
+        for (String specFlag : this.specFlags) {
+            specList.appendTag(new NBTTagString(specFlag));
+        }
+        nbt.setTag(NbtKeys.SPEC_FLAGS, specList);
+        if (this.displayedRibbon != null) {
+            nbt.setString(NbtKeys.DISPLAY_RIBBON, this.displayedRibbon.toString());
+        }
+        NBTTagList ribbonList = new NBTTagList();
+        for (EnumRibbonType ribbon : this.ribbons) {
+            ribbonList.appendTag(new NBTTagString(ribbon.toString()));
+        }
+        nbt.setTag(NbtKeys.RIBBONS, ribbonList);
+        return nbt;
     }
 
+    /**
+     * Change "defense" to "defence" in 1.12.2 version
+     *
+     * @param nbt
+     */
     private void defenseTo1122(NBTTagCompound nbt) {
         //Stat
         nbt.setShort("StatsDefence", nbt.getShort("StatsDefense"));
@@ -335,7 +460,49 @@ public class PokemonBean extends Pokemon {
         }
     }
 
+    /**
+     * Change "defence" to "defense" in 1.16.5 version
+     *
+     * @param nbt
+     */
     private void defenceTo1165(NBTTagCompound nbt) {
+        //Stat
+        nbt.setShort("StatsDefense", nbt.getShort("StatsDefence"));
+        nbt.removeTag("StatsDefence");
 
+        nbt.setShort("StatsSpecialDefense", nbt.getShort("StatsSpecialDefence"));
+        nbt.removeTag("StatsSpecialDefence");
+
+        //IV and HT
+        nbt.setByte("IVDefense", nbt.getByte("IVDefence"));
+        nbt.removeTag("IVDefence");
+
+        if (nbt.hasKey("IV_HTDefence")) {
+            nbt.setBoolean("IV_HTDefense", nbt.getBoolean("IV_HTDefence"));
+            nbt.removeTag("IV_HTDefence");
+        }
+
+        if (nbt.hasKey("IV_HTSpecialDefence")) {
+            nbt.setBoolean("IV_HTSpecialDefense", nbt.getBoolean("IV_HTSpecialDefence"));
+            nbt.removeTag("IV_HTSpecialDefence");
+        }
+
+        //EV
+        nbt.setShort("EVDefense", nbt.getShort("EVDefence"));
+        nbt.removeTag("EVDefence");
+
+        nbt.setShort("EVSpecialDefense", nbt.getShort("EVSpecialDefence"));
+        nbt.removeTag("EVSpecialDefence");
+
+        //Bonus
+        if (nbt.hasKey("BonusDefence")) {
+            nbt.setShort("BonusDefense", nbt.getShort("BonusDefence"));
+            nbt.removeTag("BonusDefence");
+        }
+
+        if (nbt.hasKey("BonusSpDefence")) {
+            nbt.setShort("BonusSpDefense", nbt.getShort("BonusSpDefence"));
+            nbt.removeTag("BonusSpDefence");
+        }
     }
 }
