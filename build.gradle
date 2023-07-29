@@ -1,0 +1,109 @@
+buildscript {
+    repositories {
+        maven { url = "https://jitpack.io" }
+        maven { url = 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url = 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url = 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://repo.lucko.me/' }
+        maven { url "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url "https://maven.envyware.co.uk/releases"}
+        maven { url = 'https://repo.spongepowered.org/maven'}
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath "com.github.johnrengelman:shadow:7.1.2"
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url = "https://jitpack.io" }
+        maven { url = 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url = 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://repo.lucko.me/' }
+        maven { url "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url "https://maven.envyware.co.uk/releases"}
+        maven { url = 'https://repo.spongepowered.org/maven'}
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+version = '1.16.5-1.0'
+group = 'com.github.lileep.pixelmonbank'
+archivesBaseName = 'PixelmonBank'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(11)
+
+minecraft {
+    mappings channel: 'official', version: '1.16.5'
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
+    implementation files('libs/Pixelmon-1.16.5-9.1.5-server.jar')
+
+    shadow 'mysql:mysql-connector-java:8.0.+'
+
+    shadow group: 'com.zaxxer', name: 'HikariCP', version: '4.0.1'
+    shadow 'io.lettuce:lettuce-core:6.2.2.RELEASE'
+
+    shadow group: 'org.spongepowered', name: 'configurate-yaml', version: '4.0.0'
+
+    shadow (group: 'com.envyful.api', name: 'commons', version: '4.8.1')
+    shadow (group: 'com.envyful.api', name: 'forge16', version: '4.8.1'){
+        transitive = false
+    }
+    shadow (group: 'com.envyful.api', name: 'reforged16', version: '4.8.1') {
+        transitive = false
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    archiveName = archivesBaseName + '-' + rootProject.name + '-Forge.jar'
+
+    relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
+    relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
+    relocate('io.leangen.geantyref', 'com.github.lileep.pixelmonbank.shade.geantyref')
+    relocate('com.google.gson', 'com.github.lileep.pixelmonbank.shade.gson')
+//    relocate('com.google', 'com.github.lileep.pixelmonbank.shade.google')
+//    relocate('com.mysql', 'com.github.lileep.pixelmonbank.shade.mysql')
+    relocate('com.zaxxer', 'com.github.lileep.pixelmonbank.shade.hikari')
+    relocate('org.slf4j', 'com.github.lileep.pixelmonbank.shade.slf4j')
+    relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
+
+    //Extra:
+//    relocate('io.lettuce', 'com.github.lileep.pixelmonbank.shade.lettuce')
+//    relocate('io.netty', 'com.github.lileep.pixelmonbank.shade.netty')
+//    relocate('javax.annotation', 'com.github.lileep.pixelmonbank.shade.annotation')
+//    relocate('org.apache', 'com.github.lileep.pixelmonbank.shade.apache')
+//    relocate('org.reactivestreams', 'com.github.lileep.pixelmonbank.shade.reactivestreams')
+//    relocate('reactor', 'com.github.lileep.pixelmonbank.shade.reactor')
+    //relocate('org.bstats', 'com.github.lileep.pixelmonbank.shade.bstats')
+
+    exclude "**/module-info.class"
+}
+
+reobf {
+    shadowJar {
+        getClasspath().setFrom(sourceSets.main.compileClasspath)
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}

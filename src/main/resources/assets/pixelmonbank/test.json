@@ -1,0 +1,123 @@
+{
+  EVSpeed: 0s,
+  IVAttack: 22b,
+  Growth: 3b,
+  originalTrainerUUIDMost: -8925793429411053857L,
+  Moveset: [
+    {
+      MoveID: 181s,
+      MovePP: 40b
+    },
+    {
+      MoveID: 2s,
+      MovePP: 35b
+    }
+  ],
+  PersistentData: {},
+  Gender: 0b,
+  EVSpecialDefence: 0s,
+  GigantamaxFactor: 0b,
+  StatsSpecialDefence: 15s,
+  Name: Magikarp,
+  isInRanch: 0b,
+  Friendship: 70s,
+  StatsDefence: 30s,
+  IVDefence: 26b,
+  EVAttack: 0s,
+  StatsSpecialAttack: 14s,
+  IVSpDef: 14b,
+  CaughtBall: 0b,
+  IVHP: 30b,
+  AbilitySlot: 0b,
+  EVHP: 0s,
+  ndex: 129s,
+  ribbon_display: NONE,
+  ribbons: [],
+  originalTrainerUUIDLeast: -6874518737557046049L,
+  Nature: 3b,
+  StatsHP: 42s,
+  UUIDLeast: -5031851186099128405L,
+  Health: 42,
+  originalTrainer: wujichen158,
+  SpecFlags: [],
+  DoesLevel: 1b,
+  DynamaxLevel: 0,
+  Variant: 0b,
+  StatsSpeed: 35s,
+  EVSpecialAttack: 0s,
+  IsShiny: 0b,
+  StatsAttack: 12s,
+  UUIDMost: -1311315653691880956L,
+  IVSpeed: 0b,
+  Level: 19,
+  IVSpAtt: 22b,
+  EVDefence: 0s,
+  NBT_VERSION: 1b,
+  EXP: 0,
+  RelrnMoves: []
+}
+
+{
+  EVSpeed: 0s,
+  IVAttack: 22b,
+  Growth: 2b,
+  originalTrainerUUIDMost: -8925793429411053857L,
+  Moveset: [
+    {
+      MoveID: 3s,
+      MovePP: 40b
+    },
+    {
+      MoveID: 43s,
+      MovePP: 35b
+    },
+    {
+      MoveID: 44s,
+      MovePP: 24b
+    }
+  ],
+  PersistentData: {},
+  Gender: 0b,
+  EVSpecialDefence: 0s,
+  GigantamaxFactor: 0b,
+  StatsSpecialDefence: 9s,
+  Name: "Litten",
+  isInRanch: 0b,
+  Friendship: 70s,
+  StatsDefence: 9s,
+  IVDefence: 12b,
+  EVAttack: 0s,
+  StatsSpecialAttack: 11s,
+  IVSpDef: 8b,
+  CaughtBall: 0b,
+  IVHP: 3b,
+  AbilitySlot: 0b,
+  EVHP: 0s,
+  ndex: 725s,
+  ribbon_display: "DESTINY",
+  ribbons: [
+    "DESTINY"
+  ],
+  originalTrainerUUIDLeast: -6874518737557046049L,
+  Nature: 6b,
+  StatsHP: 19s,
+  UUIDLeast: -7662415764784485672L,
+  Health: 19,
+  originalTrainer: "wujichen158",
+  SpecFlags: [],
+  DoesLevel: 1b,
+  DynamaxLevel: 0,
+  Variant: -1b,
+  StatsSpeed: 10s,
+  EVSpecialAttack: 0s,
+  IsShiny: 0b,
+  StatsAttack: 13s,
+  UUIDMost: 5938965030753879875L,
+  IVSpeed: 0b,
+  Level: 5,
+  IVSpAtt: 12b,
+  EVDefence: 1s,
+  NBT_VERSION: 1b,
+  EXP: 42,
+  RelrnMoves: []
+}

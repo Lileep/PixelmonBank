@@ -1,0 +1,36 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="All rights reserved"
+issueTrackerURL="https://github.com/Lileep/PixelmonBank/issues"
+
+[[mods]]
+modId="pixelmonbank"
+version="${file.jarVersion}"
+displayName="Pixelmon Bank"
+# logoFile="logo.png"
+credits="Thanks for developers"
+authors="Lileep"
+description='''
+Minecraft server pixelmon transfer system
+'''
+
+[[dependencies.pixelmonbank]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.pixelmonbank]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.pixelmonbank]]
+    modId="pixelmon"
+    mandatory=true
+    versionRange="[9.1.0,)"
+    ordering="NONE"
+    side="BOTH"
