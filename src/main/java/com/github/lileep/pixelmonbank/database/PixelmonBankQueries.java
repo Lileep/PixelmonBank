@@ -24,8 +24,6 @@ public class PixelmonBankQueries {
 
     public static final String CHECK_COL_ORDER = "show columns from `%s`.`pixelmon_bank`";
 
-    public static final String CHECK_COL_TYPE = CHECK_COL_ORDER + " where Field='pixelmon_uuid'";
-
     public static final String REMOVE_P_UUID = "ALTER TABLE `%s`.`pixelmon_bank` DROP COLUMN pixelmon_uuid";
     public static final String ADD_ID = "ALTER TABLE `%s`.`pixelmon_bank` ADD COLUMN id bigint AUTO_INCREMENT PRIMARY KEY FIRST";
 
@@ -36,16 +34,6 @@ public class PixelmonBankQueries {
 
     public static final String REMOVE_TIME_POINT_INDEX = "ALTER TABLE `%s`.`pixelmon_bank` DROP INDEX time_point";
 
-
-
-    public static final String CHANGE_COL = "alter table pixelmon_bank modify column player_uuid varchar(64) after pixelmon_uuid";
-
-    public static final String CHANGE_NAME_TYPE = "ALTER TABLE pixelmon_bank CHANGE pixelmon_uuid id BIGINT AUTO_INCREMENT, ADD PRIMARY KEY (id)";
-    public static final String CHANGE_TYPE_OLD = "ALTER TABLE pixelmon_bank MODIFY COLUMN pixelmon_uuid uuid";
-
-    public static final String REGEN_UUID = "UPDATE pixelmon_bank SET pixelmon_uuid = UUID()";
-
-    public static final String CHANGE_COL_NAME = "ALTER TABLE pixelmon_bank CHANGE COLUMN pixelmon_uuid uuid uuid";
 
 
     public static final String SEND_ONE = "insert into `%s`.`pixelmon_bank` " +

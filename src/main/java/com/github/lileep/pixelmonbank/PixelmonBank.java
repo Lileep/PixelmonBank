@@ -163,54 +163,6 @@ public class PixelmonBank {
         }
     }
 
-    @Deprecated
-    private void checkAndUpdateDBOld(Connection connection) {
-        LOGGER.info("Checking for DB updating...");
-        try {
-            //Check columns order
-            ResultSet rs = connection.prepareStatement(PixelmonBankQueries.CHECK_COL_ORDER).executeQuery();
-            int playerUuidIndex = -1;
-            int pixelmonUuidIndex = -1;
-            int index = 0;
-            while (rs.next()) {
-                String columnName = rs.getString("Field");
-                if ("player_uuid".equals(columnName)) {
-                    playerUuidIndex = index;
-                } else if ("pixelmon_uuid".equals(columnName)) {
-                    pixelmonUuidIndex = index;
-                }
-                index++;
-            }
-            //Swap 2 columns if player_uuid goes first
-            if (playerUuidIndex == 0 && pixelmonUuidIndex == 1) {
-                connection.prepareStatement(PixelmonBankQueries.CHANGE_COL).executeUpdate();
-            }
-
-
-            //Check the data type of pixelmon_uuid
-            rs = connection.prepareStatement(PixelmonBankQueries.CHECK_COL_TYPE).executeQuery();
-            String columnType = "";
-            boolean hasPixelmonUuid = false;
-            if (rs.next()) {
-                hasPixelmonUuid = true;
-                columnType = rs.getString("Type");
-            }
-            //Check whether the column type is uuid
-            if (!"uuid".equals(columnType)) {
-                connection.prepareStatement(PixelmonBankQueries.CHANGE_NAME_TYPE).executeUpdate();
-                connection.prepareStatement(PixelmonBankQueries.REGEN_UUID).executeUpdate();
-            }
-
-
-            //Change column name
-            if (hasPixelmonUuid) {
-                connection.prepareStatement(PixelmonBankQueries.CHANGE_COL_NAME).executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @SubscribeEvent
     public void init(final FMLServerStartingEvent event) {
         SyncHandler.getInstance().register(new PixelmonSerializer());
