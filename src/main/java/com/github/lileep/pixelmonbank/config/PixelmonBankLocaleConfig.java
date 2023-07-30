@@ -21,9 +21,15 @@ public class PixelmonBankLocaleConfig {
     public static String cfgAllowUltraBeast = "Whether to allow ultra beasts to be sent to Pixelmon Bank";
     public static String cfgAllowEgg = "Whether to allow eggs to be sent to Pixelmon Bank";
     public static String cfgAllowUntradeable = "Whether to allow untradeable pixelmons to be sent to Pixelmon Bank";
+    public static String cfgSterializeWhenWithDraw = "Whether to set the pokemon to be unbreedable when withdraw";
+    public static String cfgUntradifyWhenWithdraw = "Whether to set the pokemon to be untradeable when withdraw";
+    public static String cfgRestrictList = "Listed pixelmons will be limited in a specified amount when sent to Pixelmon Bank(Comma separate)";
+    public static String cfgRestrictCount = "The limit of pixelmons in the restrict list";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
+    public static String cfgAllowItem = "Whether to allow pixelmons that held items to be sent to Pixelmon Bank";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
+    public static String cfgMaxCount= "The max amount of pixelmons that can be send to Pixelmon Bank per player";
     public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
     public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
     public static String cfgOverridePaletteWithCT = "Whether to use CustomTexture as palette while sending and use palette as CustomTexture while retrieving to become compatible with 1.16. DO NOT set to true if you don't exactly know what does this mean.";
@@ -48,7 +54,10 @@ public class PixelmonBankLocaleConfig {
     public static String noEgg = "&cYou can't send pixelmon eggs to Pixelmon Bank.";
     public static String noUntradeable = "&cYou can't send untradeable pixelmons to Pixelmon Bank.";
     public static String noBlackList = "&c%s is in black list, cannot be sent to Pixelmon Bank.";
+    public static String noRestrictList = "&cThe amount of %s has reached the maximum value in the restrict list, cannot be sent to Pixelmon Bank.";
+    public static String noHeldItem = "&cPixelmons holding items cannot be sent to Pixelmon Bank.";
     public static String noBlackListItem = "&cItem %s is in black list, pixelmons holding this cannot be sent to Pixelmon Bank.";
+    public static String reachMax = "&cPixelmon Bank has already stored %d of your pixelmons, which reaching the max value.";
     public static String noMaxIVs = "&cPixelmon Bank only allow pixelmons that have no more than %d max iv to be sent to.";
     public static String findNone = "&cThere's no such pixelmon in your Pixelmon Bank.";
     public static String haveNone = "&cYou don't have any pixelmons in your Pixelmon Bank.";
@@ -110,7 +119,10 @@ public class PixelmonBankLocaleConfig {
         noEgg = config.get(category, "err-no-egg", noEgg).getString();
         noUntradeable = config.get(category, "err-no-untradeable", noUntradeable).getString();
         noBlackList = config.get(category, "err-no-blacklist", noBlackList).getString();
+        noRestrictList = config.get(category, "err-no-restrictlist", noRestrictList).getString();
+        noHeldItem = config.get(category, "err-no-held-item", noHeldItem).getString();
         noBlackListItem = config.get(category, "err-no-blacklist-item", noBlackListItem).getString();
+        reachMax = config.get(category, "err-reach-max", reachMax).getString();
         noMaxIVs = config.get(category, "err-no-max-ivs", noMaxIVs).getString();
         findNone = config.get(category, "err-find-none", findNone).getString();
         haveNone = config.get(category, "err-have-none", haveNone).getString();

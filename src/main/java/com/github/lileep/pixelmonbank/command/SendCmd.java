@@ -85,6 +85,13 @@ public class SendCmd {
         //Judge admin bypass
         final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
+        //Check max count
+        int maxCount = PixelmonBankConfig.MAX_COUNT;
+        if (maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.reachMax, maxCount));
+            return;
+        }
+
         //Check untradeable
         if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable") && !bypass) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
@@ -107,9 +114,19 @@ public class SendCmd {
 
         //Send logic
         EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
-        if (SyncHandler.getInstance().sendOne(player.getUuid().toString(), pokemon)) {
+        String uuid = player.getUuid().toString();
+        if (SyncHandler.getInstance().sendOne(uuid, pokemon) &&
+                SyncHandler.getInstance().updateTotal(1, uuid)) {
             //Delete player's pixelmon
             sStorage.set(slot - 1, null);
+
+            //Restrict Amount sync
+            if (isRestrict(pokemon)) {
+                if (!SyncHandler.getInstance().updateRestrictCount(1, uuid)) {
+                    return;
+                }
+            }
+
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
         }
     }
@@ -123,16 +140,22 @@ public class SendCmd {
         }
 
         //Check black lists
-        if (!PixelmonBankConfig.ALLOW_LEGENDARY && EnumSpecies.legendaries.contains(pokemon.getSpecies())) {
+        if (!PixelmonBankConfig.ALLOW_LEGENDARY && pokemon.getSpecies().isLegendary()) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noLegendary));
             return false;
-        } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && EnumSpecies.ultrabeasts.contains(pokemon.getSpecies())) {
+        } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && pokemon.getSpecies().isUltraBeast()) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
             return false;
         } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
             List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
             if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+                return false;
+            }
+        } else if (isRestrict(pokemon)) {
+            int restrictCount = SyncHandler.getInstance().getRestrictCount(sender.getGameProfile().getId().toString());
+            if (restrictCount >= PixelmonBankConfig.RESTRICT_COUNT) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noRestrictList, pokemon.getLocalizedName()));
                 return false;
             }
         }
@@ -161,6 +184,10 @@ public class SendCmd {
         }
 
         //Check held item
+        if (!PixelmonBankConfig.ALLOW_ITEM && !pokemon.getHeldItem().isEmpty()) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noHeldItem));
+            return false;
+        }
         if (PixelmonBankConfig.BLACK_LIST_ITEM.length > 0) {
             List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST_ITEM);
             if (blackList.contains(Objects.requireNonNull(pokemon.getHeldItem().getItem().getRegistryName()).toString())) {
@@ -179,5 +206,13 @@ public class SendCmd {
 //            }
 
         return true;
+    }
+
+    private boolean isRestrict(Pokemon pokemon) {
+        if (PixelmonBankConfig.RESTRICT_LIST.length > 0) {
+            List<String> restrictList = Arrays.asList(PixelmonBankConfig.RESTRICT_LIST);
+            return restrictList.contains(pokemon.getLocalizedName().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getPokemonName().toLowerCase());
+        }
+        return false;
     }
 }
