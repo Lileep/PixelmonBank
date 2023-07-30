@@ -46,7 +46,7 @@ public class PixelmonBankQueries {
             "player_uuid = ? and withdraw_time is null";
 
     //Use inner join to improve the efficiency
-    public static final String GET_ALL_PAGEABLE = "select pixelmon_data from `%s`.`pixelmon_bank` as t1 join (" +
+    public static final String GET_ALL_PAGEABLE = "select id, pixelmon_data from `%s`.`pixelmon_bank` as t1 join (" +
             "select id from `%s`.`pixelmon_bank` where player_uuid = ? and withdraw_time is null limit ?, ?" +
             ") as t2 on t1.id = t2.id and t1.withdraw_time is null";
 
@@ -60,7 +60,7 @@ public class PixelmonBankQueries {
     public static final String INIT_PLAYER_INFO = "insert into `%s`.`pbk_player_info` " +
             "(player_uuid) " +
             "values (?)";
-    public static final String RESET_PLAYER_INFO = "update `%s`.`pbk_player_info` set total = 0 and restrict_count = 0 where " +
+    public static final String RESET_PLAYER_INFO = "update `%s`.`pbk_player_info` set total = 0, restrict_count = 0 where " +
             "player_uuid = ?";
     public static final String SELECT_PLAYER_INFO = "select ? from `%s`.`pbk_player_info` where " +
             "player_uuid = ?";
