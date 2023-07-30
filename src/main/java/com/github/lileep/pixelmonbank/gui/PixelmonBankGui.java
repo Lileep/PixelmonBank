@@ -18,6 +18,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class PixelmonBankGui {
@@ -31,7 +32,7 @@ public class PixelmonBankGui {
             .clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> envyPlayer.executeCommands("pixelmonbank getall")));
     private static final ItemBuilder INFO_BUTTON_ITEM = new ItemBuilder(new ItemStack(Blocks.GOLD_BLOCK));
 
-    public static void open(EnvyPlayer<EntityPlayerMP> player, List<Pokemon> pokemonList, int page, int count) {
+    public static void open(EnvyPlayer<EntityPlayerMP> player, Map<Integer, Pokemon> pokemonMap, int page, int count) {
         Pane pane = GuiFactory.paneBuilder()
                 .topLeftY(0)
                 .topLeftX(0)
@@ -39,7 +40,7 @@ public class PixelmonBankGui {
                 .width(9)
                 .build();
 
-        for (Pokemon pokemon : pokemonList) {
+        pokemonMap.forEach((id, pokemon) -> {
             pane.add(GuiFactory.displayableBuilder(ItemStack.class)
                     .itemStack(new ItemBuilder(UtilSprite.getPixelmonSprite(pokemon))
                             .name(UtilChatColour.translateColourCodes('&', "&b" + pokemon.getLocalizedName() + (pokemon.isShiny() ? "&e★" : "")))
@@ -59,7 +60,7 @@ public class PixelmonBankGui {
                                 (((EnvyPlayer<EntityPlayerMP>) envyPlayer).getParent()).closeScreen();
                             })
                     ).build());
-        }
+        });
 
         if (page > 1) {
             pane.set(0, 5,

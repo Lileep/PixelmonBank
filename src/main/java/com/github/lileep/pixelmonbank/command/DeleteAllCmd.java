@@ -35,7 +35,9 @@ public class DeleteAllCmd {
         if (!Optional.ofNullable(targetPlayer).isPresent()) {
             return;
         }
-        if (SyncHandler.getInstance().delAll(targetPlayer.getUuid().toString())) {
+        String uuid = targetPlayer.getUuid().toString();
+        if (SyncHandler.getInstance().resetPlayerInfo(uuid) &&
+                SyncHandler.getInstance().delAll(uuid)) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successDeleteMsg));
         }
 

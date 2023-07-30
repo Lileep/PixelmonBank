@@ -51,7 +51,9 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-    compile files('libs/Pixelmon-1.12.2-8.4.3-universal.jar')
+    compile files('libs/Pixelmon-1.12.2-8.4.3-server.jar')
+
+    shadow 'mysql:mysql-connector-java:8.0.+'
 
     shadow group: 'com.github.Pixelmon-Development.API', name: 'commons', version: '2.3.0'
     shadow group: 'com.github.Pixelmon-Development.API', name: 'forge', version: '2.3.0'

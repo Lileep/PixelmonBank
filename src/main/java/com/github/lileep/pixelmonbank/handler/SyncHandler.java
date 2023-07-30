@@ -41,15 +41,15 @@ public class SyncHandler {
         //Access db
         return PixelmonBankDBManager.getInstance().sendOne(
                 playerUUID,
-                pokemon.getUUID().toString(),
                 dataPack
         ) > 0;
     }
 
-    public Pokemon getOne(String playerUUID, String pokemonUUID) {
+
+    public Pokemon getOne(int id, String playerUUID) {
 
         //Access db & get data
-        DataPack dataPack = PixelmonBankDBManager.getInstance().getOne(playerUUID, pokemonUUID);
+        DataPack dataPack = PixelmonBankDBManager.getInstance().getOne(id, playerUUID);
 
         //Deal with NPE of dataPack
         if (Optional.ofNullable(dataPack).isPresent()) {
@@ -68,24 +68,39 @@ public class SyncHandler {
         return pokemonList;
     }
 
-    public List<Pokemon> getAllPageable(String playerUUID, int pageNum, int pageSize) {
-        List<DataPack> dataPackList = PixelmonBankDBManager.getInstance().getAllPageable(playerUUID, (pageNum - 1) * pageSize, pageSize);
+    public Map<Integer, Pokemon> getAllPageable(String playerUUID, int pageNum, int pageSize) {
+        Map<Integer, DataPack> dataPackMap = PixelmonBankDBManager.getInstance().getAllPageable(playerUUID, (pageNum - 1) * pageSize, pageSize);
         //Not necessary to judge null since db will return a new list
-        List<Pokemon> pokemonList = new ArrayList<>();
+//        List<Pokemon> pokemonList = new ArrayList<>();
+        Map<Integer, Pokemon> pokemonMap = new LinkedHashMap<>();
         //If the list has no elements, for-each block will not be executed
-        dataPackList.forEach(dataPack -> pokemonList.add(serializers.get(Reference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0)));
-        return pokemonList;
+        dataPackMap.forEach((id ,dataPack) -> pokemonMap.put(id, serializers.get(Reference.PIXELMON_SERIALIZER).deserialize(dataPack).get(0)));
+        return pokemonMap;
     }
 
-    public boolean delOne(String playerUUID, String pokemonUUID) {
-        return PixelmonBankDBManager.getInstance().delOne(playerUUID, pokemonUUID) > 0;
+    public boolean delOne(int id, String playerUUID) {
+        return PixelmonBankDBManager.getInstance().delOne(id, playerUUID) > 0;
     }
 
     public boolean delAll(String playerUUID) {
         return PixelmonBankDBManager.getInstance().delAll(playerUUID) > 0;
     }
 
-    public int count(String playerUUID) {
-        return PixelmonBankDBManager.getInstance().count(playerUUID);
+    public boolean resetPlayerInfo(String playerUUID) {
+        return PixelmonBankDBManager.getInstance().resetPlayerInfo(playerUUID) > 0;
+    }
+
+    public int getTotal(String playerUUID) {
+        return PixelmonBankDBManager.getInstance().getPlayerInfo("total", playerUUID);
+    }
+    public int getRestrictCount(String playerUUID) {
+        return PixelmonBankDBManager.getInstance().getPlayerInfo("restrict_count", playerUUID);
+    }
+
+    public boolean updateTotal(int amount, String playerUUID) {
+        return PixelmonBankDBManager.getInstance().updatePlayerInfo("total", amount, playerUUID) > 0;
+    }
+    public boolean updateRestrictCount(int amount, String playerUUID) {
+        return PixelmonBankDBManager.getInstance().updatePlayerInfo("restrict_count", amount, playerUUID) > 0;
     }
 }

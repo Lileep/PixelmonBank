@@ -55,6 +55,7 @@ public class PixelmonBankDatabase implements Database {
 
         config.addDataSourceProperty("serverName", ip);
         config.addDataSourceProperty("port", port);
+        config.setDriverClassName(com.mysql.cj.jdbc.Driver.class.getName());
 //        config.addDataSourceProperty("databaseName", database);
         config.addDataSourceProperty("user", username);
         config.addDataSourceProperty("password", password);

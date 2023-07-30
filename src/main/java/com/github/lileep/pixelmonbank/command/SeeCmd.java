@@ -17,6 +17,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import java.util.List;
+import java.util.Map;
 
 @Command(
         value = "see"
@@ -41,11 +42,11 @@ public class SeeCmd {
             }
         }
 
-        List<Pokemon> pokemonList = SyncHandler
+        Map<Integer, Pokemon> pokemonMap = SyncHandler
                 .getInstance()
                 .getAllPageable(player.getUuid().toString(), pageNum, 45);
 
-        int count = SyncHandler.getInstance().count(player.getUuid().toString());
-        PixelmonBankGui.open(player, pokemonList, pageNum, count);
+        int count = SyncHandler.getInstance().getTotal(player.getUuid().toString());
+        PixelmonBankGui.open(player, pokemonMap, pageNum, count);
     }
 }

@@ -1,26 +1,17 @@
 package com.github.lileep.pixelmonbank.handler;
 
 import com.envyful.api.forge.chat.UtilChatColour;
+import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.IVStore;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Moveset;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 
 import java.util.Optional;
 
 public class MsgHandler {
-
-    /**
-     * Add prefix to the given msg,
-     * translate color char to real color
-     *
-     * @param msg Message to process
-     * @return processed message
-     */
-    public static TextComponentString prefixedColorMsg(String msg) {
-        return new TextComponentString(UtilChatColour.translateColourCodes('&', PixelmonBankLocaleConfig.prefix + msg));
-    }
 
     /**
      * Add prefix to the given msg,
@@ -32,7 +23,7 @@ public class MsgHandler {
      * @return processed message
      */
     public static TextComponentString prefixedColorMsg(String msg, Object... args) {
-        return prefixedColorMsg(String.format(msg, args));
+        return new TextComponentString(UtilChatColour.translateColourCodes('&', PixelmonBankLocaleConfig.prefix + String.format(msg, args)));
     }
 
     /**
