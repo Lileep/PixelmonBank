@@ -5,8 +5,6 @@ A forge based Minecraft mod for transferring pixelmons from servers to databases
 
 Inspired by Pokémon official system: Pokémon Bank.
 
-**NOTICE:** It's recommend to create a database named `pixelbank` before using.
-
 Server platform independent, enjoy :)
 
 ## Dependencies
@@ -22,7 +20,7 @@ Server platform independent, enjoy :)
 
 ## Installation
 
-Put the released .jar into your server's `mods` folder, then run it.
+Put the released .jar into your server's `mods` folder, then start it.
 
 Stop your server, change the sql details in `config/pixelmonbank/config.cfg`.
 
