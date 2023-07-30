@@ -46,8 +46,8 @@ public class PixelmonBankQueries {
             "player_uuid = ? and withdraw_time is null";
 
     //Use inner join to improve the efficiency
-    public static final String GET_ALL_PAGEABLE = "SELECT id, pixelmon_data FROM `%s`.`pixelmon_bank` WHERE" +
-            "player_uuid = ? AND withdraw_time IS NOT NULL LIMIT ?, ?";
+    public static final String GET_ALL_PAGEABLE = "SELECT id, pixelmon_data FROM `%s`.`pixelmon_bank` WHERE " +
+            "player_uuid = ? AND withdraw_time IS NULL LIMIT ?, ?";
 
     //Not hard delete
     public static final String DEL_ONE = "update `%s`.`pixelmon_bank` set withdraw_time = now() where " +
@@ -61,9 +61,9 @@ public class PixelmonBankQueries {
             "values (?)";
     public static final String RESET_PLAYER_INFO = "update `%s`.`pbk_player_info` set total = 0, restrict_count = 0 where " +
             "player_uuid = ?";
-    public static final String SELECT_PLAYER_INFO = "select ? from `%s`.`pbk_player_info` where " +
+    public static final String SELECT_PLAYER_INFO = "select %s from `%s`.`pbk_player_info` where " +
             "player_uuid = ?";
-    public static final String UPDATE_PLAYER_INFO = "update `%s`.`pbk_player_info` set ? = ? + ? where " +
+    public static final String UPDATE_PLAYER_INFO = "update `%s`.`pbk_player_info` set %s = %s + ? where " +
             "player_uuid = ?";
 
 }

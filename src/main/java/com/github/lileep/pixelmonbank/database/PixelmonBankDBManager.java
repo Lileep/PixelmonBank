@@ -1,6 +1,7 @@
 package com.github.lileep.pixelmonbank.database;
 
 import com.github.lileep.pixelmonbank.PixelmonBank;
+import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.data.DataPack;
 
 import javax.xml.crypto.Data;
@@ -137,10 +138,9 @@ public class PixelmonBankDBManager {
 
     public int getPlayerInfo(String info, String playerUUID) {
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, info, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
         ) {
-            statement.setString(1, info);
-            statement.setString(2, playerUUID);
+            statement.setString(1, playerUUID);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt(1);
@@ -153,12 +153,10 @@ public class PixelmonBankDBManager {
 
     public int updatePlayerInfo(String info, int amount, String playerUUID) {
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.UPDATE_PLAYER_INFO, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.UPDATE_PLAYER_INFO, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase(), info, info))
         ) {
-            statement.setString(1, info);
-            statement.setString(2, info);
-            statement.setInt(3, amount);
-            statement.setString(4, playerUUID);
+            statement.setInt(1, amount);
+            statement.setString(2, playerUUID);
             return statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

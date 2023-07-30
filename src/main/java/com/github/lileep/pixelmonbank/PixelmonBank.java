@@ -15,18 +15,15 @@ import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.data.serializer.PixelmonSerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.database.PixelmonBankQueries;
+import com.github.lileep.pixelmonbank.event.PbkEventHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.Reference;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import net.minecraftforge.fml.network.NetworkEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +43,7 @@ public class PixelmonBank {
     private PixelmonBankConfig config;
     private PixelmonBankLocaleConfig locale;
     private Database database;
+
     public PixelmonBank() {
         // Register the setup method for modloading
 //        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::preInit);
@@ -125,8 +123,8 @@ public class PixelmonBank {
             }
             //Remove the pixelmon_uuid column and add id column
             if (pixelmonUuidIndex != -1) {
-                try(PreparedStatement removePUuid = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_P_UUID, getConfig().getDatabase().getDatabase()));
-                    PreparedStatement addId = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_ID, getConfig().getDatabase().getDatabase()))
+                try (PreparedStatement removePUuid = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_P_UUID, getConfig().getDatabase().getDatabase()));
+                     PreparedStatement addId = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_ID, getConfig().getDatabase().getDatabase()))
                 ) {
                     removePUuid.executeUpdate();
                     addId.executeUpdate();
@@ -134,8 +132,8 @@ public class PixelmonBank {
             }
             //Rename time_point 2 send_time
             if (timePointIndex != -1) {
-                try(PreparedStatement removeTimePointIndex = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_TIME_POINT_INDEX, getConfig().getDatabase().getDatabase()));
-                    PreparedStatement renameTimePoint = connection.prepareStatement(String.format(PixelmonBankQueries.RENAME_TIME_POINT, getConfig().getDatabase().getDatabase()))
+                try (PreparedStatement removeTimePointIndex = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_TIME_POINT_INDEX, getConfig().getDatabase().getDatabase()));
+                     PreparedStatement renameTimePoint = connection.prepareStatement(String.format(PixelmonBankQueries.RENAME_TIME_POINT, getConfig().getDatabase().getDatabase()))
                 ) {
                     removeTimePointIndex.executeUpdate();
                     renameTimePoint.executeUpdate();
@@ -143,8 +141,8 @@ public class PixelmonBank {
             }
             //Remove the visible column
             if (visibleIndex != -1) {
-                try(PreparedStatement removeOldData = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_OLD_DATA, getConfig().getDatabase().getDatabase()));
-                    PreparedStatement removeVisible = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_VISIBLE, getConfig().getDatabase().getDatabase()))
+                try (PreparedStatement removeOldData = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_OLD_DATA, getConfig().getDatabase().getDatabase()));
+                     PreparedStatement removeVisible = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_VISIBLE, getConfig().getDatabase().getDatabase()))
                 ) {
                     removeOldData.executeUpdate();
                     removeVisible.executeUpdate();
@@ -152,7 +150,7 @@ public class PixelmonBank {
             }
             //Add withdraw time column
             if (withdrawTimeIndex == -1) {
-                try(PreparedStatement addWithdrawTime = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_WITHDRAW_TIME, getConfig().getDatabase().getDatabase()))
+                try (PreparedStatement addWithdrawTime = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_WITHDRAW_TIME, getConfig().getDatabase().getDatabase()))
                 ) {
                     addWithdrawTime.executeUpdate();
                 }
@@ -167,35 +165,12 @@ public class PixelmonBank {
     @SubscribeEvent
     public void init(final FMLServerStartingEvent event) {
         SyncHandler.getInstance().register(new PixelmonSerializer());
+        MinecraftForge.EVENT_BUS.register(PbkEventHandler.class);
     }
 
     @SubscribeEvent
     public void onCommandRegistration(RegisterCommandsEvent event) {
         this.commandFactory.registerCommand(event.getDispatcher(), new PixelmonBankCmd());
-    }
-
-    @SubscribeEvent
-    public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        PlayerEntity player = event.getPlayer();
-        UtilConcurrency.runAsync(() -> {
-            try (Connection connection = this.database.getConnection();
-                 PreparedStatement getPlayerInfo = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, getConfig().getDatabase().getDatabase()))
-            ) {
-                getPlayerInfo.setString(1, player.getStringUUID());
-                ResultSet resultSet = getPlayerInfo.executeQuery();
-                if (!resultSet.next()) {
-                    try(PreparedStatement initPlayerInfo = connection.prepareStatement(String.format(PixelmonBankQueries.INIT_PLAYER_INFO, getConfig().getDatabase().getDatabase()))) {
-                        initPlayerInfo.setString(1, player.getStringUUID());
-                        if (initPlayerInfo.executeUpdate() > 0) {
-                            LOGGER.info(String.format("Player %s doesn't have Pixelmon Bank records before, inited", player.getDisplayName().getString()));
-                        }
-                    }
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     public ForgePlayerManager getPlayerManager() {

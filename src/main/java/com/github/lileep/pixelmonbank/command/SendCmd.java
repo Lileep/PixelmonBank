@@ -89,7 +89,7 @@ public class SendCmd {
 
         //Check max count
         int maxCount = pbkConfig.getMaxCount();
-        if (maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
+        if (maxCount > 0 && maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getReachMax(), maxCount), sender.getGameProfile().getId());
             return;
         }
