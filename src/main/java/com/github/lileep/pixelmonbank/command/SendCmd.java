@@ -87,7 +87,7 @@ public class SendCmd {
 
         //Check max count
         int maxCount = PixelmonBankConfig.MAX_COUNT;
-        if (maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
+        if (maxCount > 0 && maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.reachMax, maxCount));
             return;
         }

@@ -56,7 +56,7 @@ public class PixelmonBankGui {
                                     UtilChatColour.translateColourCodes('&', PixelmonBankLocaleConfig.pbankGuiGet)
                             ).build()
                     ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> {
-                                envyPlayer.executeCommands("pixelmonbank get " + pokemon.getUUID().toString());
+                                envyPlayer.executeCommands("pixelmonbank get " + id);
                                 (((EnvyPlayer<EntityPlayerMP>) envyPlayer).getParent()).closeScreen();
                             })
                     ).build());
