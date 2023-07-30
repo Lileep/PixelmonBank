@@ -38,7 +38,7 @@ allprojects {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = '1.16.5-1.0'
+version = '1.0'
 group = 'com.github.lileep.pixelmonbank'
 archivesBaseName = 'PixelmonBank'
 
@@ -72,7 +72,7 @@ dependencies {
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    archiveName = archivesBaseName + '-' + rootProject.name + '-Forge.jar'
+    archiveName = archivesBaseName + '-' + rootProject.name + '-' + version + '-Forge.jar'
 
     relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
     relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
