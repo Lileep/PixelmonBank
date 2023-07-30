@@ -4,7 +4,6 @@ public class PixelmonBankQueries {
 
     public static final String CREATE_DB = "create database if not exists %s;";
 
-    //visible: 0: can be seen, 1: cannot be seen
     public static final String CREATE_PBK_TABLE = "create table if not exists `%s`.`pixelmon_bank`(" +
             "id             bigint          primary key auto_increment, " +
             "player_uuid    varchar(64)     not null, " +

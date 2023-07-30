@@ -39,27 +39,6 @@ public class PixelmonBankGui {
                 .width(9)
                 .build();
 
-//        for (Pokemon pokemon : pokemonList) {
-//            pane.add(GuiFactory.displayableBuilder(ItemStack.class)
-//                    .itemStack(new ItemBuilder(UtilSprite.getPixelmonSprite(pokemon))
-//                            .name(UtilChatColour.colour("&b" + pokemon.getLocalizedName() + (pokemon.isShiny() ? "&e★" : "")))
-//                            .lore(
-//                                    UtilChatColour.colour("&d" + PixelmonBank.getInstance().getLocale().getPixelmonLevel() + ": " + pokemon.getPokemonLevel() + " &b|&d " + PixelmonBank.getInstance().getLocale().getPixelmonDynamaxLevel() + ": " + pokemon.getDynamaxLevel() + (pokemon.hasGigantamaxFactor() ? (" &b|&d " + PixelmonBank.getInstance().getLocale().getPixelmonCanGigantamax()) : "")),
-//                                    UtilChatColour.colour("&d" + pokemon.getGender().getLocalizedName() + " &b|&d " + pokemon.getBall().getLocalizedName()),
-//                                    UtilChatColour.colour((pokemon.hasHiddenAbility() ? "&6" : "&d") + pokemon.getAbility().getLocalizedName() + " &b|&d " + pokemon.getNature().getLocalizedName() + (Optional.ofNullable(pokemon.getMintNature()).isPresent() ? ("&6 -> " + pokemon.getMintNature().getLocalizedName()) : "")),
-//                                    pokemon.getHeldItem().isEmpty() ? StringTextComponent.EMPTY : (UtilChatColour.colour("&d" + PixelmonBank.getInstance().getLocale().getPixelmonHeld() + " " + pokemon.getHeldItem().getDisplayName().getString())),
-//                                    UtilChatColour.colour("&d" + PixelmonBank.getInstance().getLocale().getPixelmonIv() + ": " + MsgHandler.formatIV(pokemon.getIVs(), '|')),
-//                                    UtilChatColour.colour("&d" + PixelmonBank.getInstance().getLocale().getPixelmonEv() + ": " + MsgHandler.formatStatusValue(pokemon.getEVs().getArray(), '|')),
-//                                    UtilChatColour.colour("&d" + MsgHandler.formatMoves(pokemon.getMoveset(), '|')),
-//                                    StringTextComponent.EMPTY,
-//                                    UtilChatColour.colour(PixelmonBank.getInstance().getLocale().getPbankGuiGet())
-//                            ).build()
-//                    ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> {
-//                        envyPlayer.executeCommands("pixelmonbank get " + pokemon.getUUID());
-//                        (((EnvyPlayer<ServerPlayerEntity>) envyPlayer).getParent()).closeContainer();})
-//                    ).build());
-//        }
-
         pokemonMap.forEach((id, pokemon) -> {
             pane.add(GuiFactory.displayableBuilder(ItemStack.class)
                     .itemStack(new ItemBuilder(UtilSprite.getPixelmonSprite(pokemon))
