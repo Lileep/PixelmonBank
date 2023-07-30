@@ -157,6 +157,7 @@ public class PixelmonBank {
                     addWithdrawTime.executeUpdate();
                 }
             }
+            LOGGER.info("DB checking done!");
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
