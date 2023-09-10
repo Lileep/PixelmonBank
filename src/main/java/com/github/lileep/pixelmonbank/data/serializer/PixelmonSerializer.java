@@ -25,7 +25,7 @@ public class PixelmonSerializer implements ISerializer {
     @Override
     public String serialize(Pokemon pokemon) {
         Map<String, String> data = new HashMap<>(1);
-        Pokemon pokemonBean = new PokemonBean(pokemon.getUUID());
+        PokemonBean pokemonBean = new PokemonBean(pokemon.getUUID());
         pokemonBean.readFromNBT(pokemon.writeToNBT(new NBTTagCompound()));
         //TODO: Deal with nbt compound without considering pokemon uuid. Abstract it.
         data.put(pokemon.getUUID().toString(), pokemonBean.writeToNBT(new NBTTagCompound()).toString());
