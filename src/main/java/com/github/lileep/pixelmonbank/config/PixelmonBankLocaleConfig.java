@@ -32,7 +32,6 @@ public class PixelmonBankLocaleConfig {
     public static String cfgMaxCount= "The max amount of pixelmons that can be send to Pixelmon Bank per player";
     public static String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
     public static String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
-    public static String cfgOverridePaletteWithCT = "Whether to use CustomTexture as palette while sending and use palette as CustomTexture while retrieving to become compatible with 1.16. DO NOT set to true if you don't exactly know what does this mean.";
 
     public static String cfgCategoryDB = "Database settings for Pixelmon Bank. Restart server to apply instead of reload";
     public static String cfgServerName = "Name of your server. Pixelmon Bank will make this a database field";

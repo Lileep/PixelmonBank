@@ -23,7 +23,6 @@ public class PixelmonBankConfig {
     public static int MAX_COUNT = 0;
     public static int MAX_IVS = 6;
     public static boolean COUNT_HYPER_TRAINED = false;
-    public static boolean OVERRIDE_PALETTE_WITH_CT = false;
 
     public static String SERVER_NAME = "default_server";
     public static String LOCALE = "en_us";
@@ -98,8 +97,6 @@ public class PixelmonBankConfig {
         }
         MAX_IVS = maxIvs.getInt();
         COUNT_HYPER_TRAINED = config.get(category, "count_hyper_trained", COUNT_HYPER_TRAINED, PixelmonBankLocaleConfig.cfgCountHyperTrained).getBoolean();
-
-        OVERRIDE_PALETTE_WITH_CT = config.get(category, "override_palette_with_ct", OVERRIDE_PALETTE_WITH_CT, PixelmonBankLocaleConfig.cfgOverridePaletteWithCT).getBoolean();
 
         category = "database";
         config.addCustomCategoryComment(category, PixelmonBankLocaleConfig.cfgCategoryDB);
