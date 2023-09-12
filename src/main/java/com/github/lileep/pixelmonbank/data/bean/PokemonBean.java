@@ -1,6 +1,5 @@
 package com.github.lileep.pixelmonbank.data.bean;
 
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.RandomHelper;
 import com.pixelmonmod.pixelmon.api.moveskills.MoveSkill;
@@ -31,7 +30,10 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.datafix.FixTypes;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class PokemonBean extends Pokemon {
 
@@ -39,8 +41,7 @@ public class PokemonBean extends Pokemon {
         super(uuid);
     }
 
-    @Override
-    public void readFromNBT(NBTTagCompound nbt) {
+    public void readFromNBTNew(NBTTagCompound nbt) {
         if (nbt.hasKey("ndex")) {
             this.dsSpecies.set(this, nbt.getInteger("ndex"));
         } else if (nbt.hasKey(NbtKeys.NAME)) {
@@ -64,9 +65,7 @@ public class PokemonBean extends Pokemon {
         int NBT_VERSION = nbt.getByte("NBT_VERSION");
         this.setUUID(nbt.getUniqueId(NbtKeys.UUID));
 
-        //1.16 shiny compatible
-        this.setShiny("shiny".equals(nbt.getString("palette")));
-//        this.setShiny(nbt.getBoolean(NbtKeys.IS_SHINY));
+        //Shiny is done in readFromNBTSpecialMons
 
         //Compatible with previous versions
         byte special = nbt.getByte(NbtKeys.SPECIAL_TEXTURE);
@@ -109,8 +108,7 @@ public class PokemonBean extends Pokemon {
                 break;
         }
 
-        this.setCustomTexture(nbt.getString(PixelmonBankConfig.OVERRIDE_PALETTE_WITH_CT ?
-                "palette" : NbtKeys.CUSTOM_TEXTURE));
+        this.setCustomTexture(nbt.getString(NbtKeys.CUSTOM_TEXTURE));
         this.setNickname(nbt.getString(NbtKeys.NICKNAME));
         this.setCaughtBall(nbt.hasKey(NbtKeys.CAUGHT_BALL) ? EnumPokeballs.getFromIndex(nbt.getByte(NbtKeys.CAUGHT_BALL)) : EnumPokeballs.PokeBall);
         this.setNature(EnumNature.getNatureFromIndex(nbt.getByte(NbtKeys.NATURE)));
@@ -166,10 +164,11 @@ public class PokemonBean extends Pokemon {
         this.bonusStats.readFromNBT(nbt);
         this.health = nbt.getInteger(NbtKeys.HEALTH);
 
-        //TODO: Check things here 2
-//        if (this.getExtraStats() != null) {
-//            this.extraStats.readFromNBT(nbt);
-//        }
+        if (this.getExtraStats() != null) {
+            if (!this.species.is(EnumSpecies.Deoxys) && !this.species.is(EnumSpecies.Minior) && !this.species.is(EnumSpecies.Meltan)) {
+                this.extraStats.readFromNBT(nbt);
+            }
+        }
 
         if (nbt.hasKey(NbtKeys.ABILITY_SLOT)) {
             this.setAbilitySlot(nbt.getByte(NbtKeys.ABILITY_SLOT));
@@ -299,25 +298,17 @@ public class PokemonBean extends Pokemon {
 
     //1.16: com.pixelmonmod.pixelmon.api.pokemon.stats.extraStats
     //1.12: com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    public NBTTagCompound writeToNBTNew(NBTTagCompound nbt) {
         nbt.setShort("ndex", (short) this.species.getNationalPokedexInteger());
         //1.16 compatible
-//        nbt.setByte(NbtKeys.FORM, (byte) form);
         nbt.setString(NbtKeys.FORM, "");
         nbt.setByte(NbtKeys.GENDER, (byte) this.getGender().ordinal());
         nbt.setByte("NBT_VERSION", (byte) 1);
         nbt.setUniqueId(NbtKeys.UUID, this.uuid);
-//        nbt.setBoolean(NbtKeys.IS_SHINY, this.isShiny);
-        if (!this.customTexture.isEmpty()) {
-            nbt.setString(PixelmonBankConfig.OVERRIDE_PALETTE_WITH_CT ?
-                            "palette" : NbtKeys.CUSTOM_TEXTURE,
-                    this.customTexture);
-        } else {
-            nbt.removeTag(NbtKeys.CUSTOM_TEXTURE);
-            nbt.setString("palette", this.isShiny ? "shiny" : "none");
-            writeToNBTSpecialMons(nbt);
-        }
+
+        nbt.setString("palette", this.isShiny ? "shiny" : "none");
+        writeToNBTSpecialMons(nbt);
+
         if (this.nickname != null && !this.nickname.isEmpty() && !Objects.equals(this.nickname, this.species.name)) {
             nbt.setString(NbtKeys.NICKNAME, this.nickname);
         } else {
@@ -366,9 +357,14 @@ public class PokemonBean extends Pokemon {
         defenceTo1165(nbt);
 
         nbt.setInteger(NbtKeys.HEALTH, this.health);
-//        if (getExtraStats() != null) {
-//            this.extraStats.writeToNBT(nbt);
-//        }
+
+        //1.12 compatible
+        if (getExtraStats() != null) {
+            if (!this.species.is(EnumSpecies.Deoxys) && !this.species.is(EnumSpecies.Minior) && !this.species.is(EnumSpecies.Meltan)) {
+                this.extraStats.writeToNBT(nbt);
+            }
+        }
+
         if (this.abilitySlot != -1) {
             nbt.setByte(NbtKeys.ABILITY_SLOT, (byte) this.abilitySlot);
         } else if (this.ability != null) {
@@ -415,11 +411,13 @@ public class PokemonBean extends Pokemon {
             ribbonList.appendTag(new NBTTagString(ribbon.toString()));
         }
         nbt.setTag(NbtKeys.RIBBONS, ribbonList);
+        System.out.println("minior data send: " + nbt.getByte(NbtKeys.STATS_MINIOR));
         return nbt;
     }
 
     /**
      * Change "defense" to "defence" in 1.12.2 version
+     * All judgement must be done since it need to read a 1.12 nbt first
      *
      * @param nbt
      */
@@ -510,47 +508,17 @@ public class PokemonBean extends Pokemon {
         }
     }
 
-    private void readForm(NBTTagCompound nbt, byte form) {
-        this.dsForm.set(this, form);
-        if (this.species.is(EnumSpecies.Minior)) {
-            if (this.getExtraStats() != null) {
-                ((MiniorStats) this.extraStats).color = nbt.getByte(NbtKeys.STATS_MINIOR);
-            }
-        } else if (this.species.is(EnumSpecies.Deoxys)) {
-            if (this.getExtraStats() != null) {
-                ((DeoxysStats) this.extraStats).setSus(nbt.getBoolean("hasSus"));
-            }
-        } else if (this.species.is(EnumSpecies.Meltan)) {
-            if (this.getExtraStats() != null) {
-                ((MeltanStats) this.extraStats).oresSmelted = nbt.getInteger("NuggetsFed");
-            }
-        }
-    }
-
-    private void readForm(NBTTagCompound nbt, String form) {
+    private void readFromNBTSpecialMons(NBTTagCompound nbt) {
+        String form = nbt.getString(NbtKeys.FORM);
         String palette = nbt.getString("palette");
         byte formByte = 0;
-//        EnumSpecies.Greninja.getFormEnum(str);
-//        if (this.species.is(EnumSpecies.Greninja)) {
-//            System.out.println("Greninja!");
-//            String battleBondStr = EnumGreninja.BATTLE_BOND.getName();
-//            switch (palette) {
-//                case "zombie":
-//                    formByte = battleBondStr.equalsIgnoreCase(form) ? EnumGreninja.ZOMBIE_BATTLE_BOND.getForm() : EnumGreninja.ZOMBIE.getForm();
-//                    break;
-//                case "alter":
-//                    formByte = battleBondStr.equalsIgnoreCase(form) ? EnumGreninja.ALTER_BATTLE_BOND.getForm() : EnumGreninja.ALTER.getForm();
-//                    break;
-//                default:
-//                    formByte = battleBondStr.equalsIgnoreCase(form) ? EnumGreninja.BATTLE_BOND.getForm() : EnumGreninja.BASE.getForm();
-//            }
-//            System.out.println("Form byte: " + formByte);
-//        }
         if (this.species.is(EnumSpecies.Minior)) {
-            byte colorIndex = 0;
+            //If there's no color in palette(like shiny case), by default give it a random one
+            byte colorIndex = (byte) RandomHelper.getRandomNumberBetween(0, EnumMinior.values().length - 1);
             for (IEnumForm formElem : this.species.getPossibleForms(true)) {
                 if (palette.equalsIgnoreCase(formElem.getName())) {
-                    //In this case, formByte must have a color, i.e., formByte > 0
+                    //In this case, palette is a certain color,
+                    // so formByte must have a color, i.e., formByte > 0
                     colorIndex = formElem.getForm();
                     break;
                 }
@@ -598,23 +566,12 @@ public class PokemonBean extends Pokemon {
             }
         }
         this.dsForm.set(this, formByte);
-    }
-
-    private void readFromNBTSpecialMons(NBTTagCompound nbt) {
-        if (!nbt.hasKey(NbtKeys.FORM)) {
-            return;
-        }
-        String variantStr = nbt.getString(NbtKeys.FORM);
-        if ("".equals(variantStr) && !nbt.hasKey("palette")) {
-            readForm(nbt, nbt.getByte(NbtKeys.FORM));
-        } else {
-            readForm(nbt, variantStr);
-        }
+        //1.16 shiny compatible
+        this.setShiny("shiny".equals(nbt.getString("palette")));
     }
 
     private void writeToNBTSpecialMons(NBTTagCompound nbt) {
         IEnumForm pokemonForm = this.getFormEnum();
-//        IEnumForm pokemonForm1 = this.species.getFormEnum(this.form);
         if (pokemonForm.isTemporary()) {
             if (pokemonForm != EnumSpecial.Zombie) {
                 pokemonForm = pokemonForm.getDefaultFromTemporary(this);
@@ -622,17 +579,13 @@ public class PokemonBean extends Pokemon {
         }
         //Deoxys, Minior and Meltan need to be judged
         if (this.species.is(EnumSpecies.Minior)) {
-            byte colorIndex = ((MiniorStats)this.getExtraStats()).color;
-            nbt.setString("palette", EnumMinior.values()[colorIndex + 1].getName());
-            nbt.setString(NbtKeys.FORM, pokemonForm == EnumMinior.METEOR ? "meteor" : "core");
-            if (this.getExtraStats() != null) {
-                nbt.setByte(NbtKeys.STATS_MINIOR, colorIndex);
+            byte colorIndex = ((MiniorStats) this.getExtraStats()).color;
+            if (!"shiny".equals(nbt.getString("palette"))) {
+                nbt.setString("palette", EnumMinior.values()[colorIndex + 1].getName().toLowerCase());
             }
+            nbt.setString(NbtKeys.FORM, pokemonForm == EnumMinior.METEOR ? "meteor" : "core");
         } else if (this.species.is(EnumSpecies.Deoxys)) {
             nbt.setString(NbtKeys.FORM, pokemonForm.getName().toLowerCase());
-            if (this.getExtraStats() != null) {
-                nbt.setBoolean("hasSus", ((DeoxysStats)this.getExtraStats()).isSus());
-            }
         } else {
             if (this.species.is(EnumSpecies.Meltan)) {
                 if (this.getExtraStats() != null) {
@@ -640,7 +593,7 @@ public class PokemonBean extends Pokemon {
                 }
             }
 
-            String palette = pokemonForm.getFormSuffix();
+            String palette = pokemonForm.getFormSuffix().toLowerCase();
             if (palette.startsWith("-")) {
                 palette = palette.substring(1);
             }
@@ -653,43 +606,5 @@ public class PokemonBean extends Pokemon {
                 nbt.setString(NbtKeys.FORM, variant);
             }
         }
-//        System.out.println("palette: "+ palette + ", variant: "+ variant);
-//        if (this.species.is(EnumSpecies.Greninja)) {
-//            switch ((EnumGreninja) pokemonForm) {
-//                case BATTLE_BOND:
-//                case ASH:
-//                    nbt.setString(NbtKeys.FORM, "battle_bond");
-//                    break;
-//                case ZOMBIE:
-//                    nbt.setString("palette", "zombie");
-//                    break;
-//                case ZOMBIE_BATTLE_BOND:
-//                case ASH_ZOMBIE:
-//                    nbt.setString("palette", "zombie");
-//                    nbt.setString(NbtKeys.FORM, "battle_bond");
-//                    break;
-//                case ALTER:
-//                    nbt.setString("palette", "alter");
-//                    break;
-//                case ALTER_BATTLE_BOND:
-//                case ASH_ALTER:
-//                    nbt.setString("palette", "alter");
-//                    nbt.setString(NbtKeys.FORM, "battle_bond");
-//                    break;
-//                case BASE:
-//                default:
-//                    break;
-//            }
-//        } else {
-//            List<IEnumForm> formList = this.species.getPossibleForms(true);
-//
-//            EnumSpecial[] enumSpecials = Arrays.copyOfRange(EnumSpecial.values(), 1, EnumSpecial.values().length);
-//            for (EnumSpecial enumSpecial : enumSpecials) {
-//                if (enumSpecial == pokemonForm) {
-//                    nbt.setString("palette", enumSpecial.getName().toLowerCase());
-//                    break;
-//                }
-//            }
-//        }
     }
 }
