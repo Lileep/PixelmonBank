@@ -140,7 +140,7 @@ public class SendCmd {
         }
 
         //Check black lists
-        if (!PixelmonBankConfig.ALLOW_LEGENDARY && pokemon.getSpecies().isLegendary()) {
+        if (!PixelmonBankConfig.ALLOW_LEGENDARY && pokemon.isLegendary()) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noLegendary));
             return false;
         } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && pokemon.getSpecies().isUltraBeast()) {
