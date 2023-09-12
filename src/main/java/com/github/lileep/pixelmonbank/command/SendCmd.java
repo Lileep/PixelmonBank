@@ -141,10 +141,10 @@ public class SendCmd {
         }
 
         //Check black lists
-        if (!pbkConfig.isAllowLegendary() && PixelmonSpecies.isLegendary(pokemon.getSpecies())) {
+        if (!pbkConfig.isAllowLegendary() && pokemon.isLegendary(false)) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getNoLegendary()), sender.getGameProfile().getId());
             return false;
-        } else if (!pbkConfig.isAllowUltrabeast() && PixelmonSpecies.isUltraBeast(pokemon.getSpecies())) {
+        } else if (!pbkConfig.isAllowUltrabeast() && pokemon.isUltraBeast()) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getNoUltrabeast()), sender.getGameProfile().getId());
             return false;
         } else if (pbkConfig.getBlackList().length > 0) {
