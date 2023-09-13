@@ -38,7 +38,7 @@ public class DeleteAllCmd {
         String uuid = targetPlayer.getUuid().toString();
         if (SyncHandler.getInstance().resetPlayerInfo(uuid) &&
                 SyncHandler.getInstance().delAll(uuid)) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessDeleteMsg()), Util.NIL_UUID);
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessDeleteMsg(), targetPlayer.getName()), Util.NIL_UUID);
         }
     }
 }
