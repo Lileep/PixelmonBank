@@ -1,0 +1,198 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+	id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+minecraft {
+    mappings channel: mapping_channel, version: mapping_version
+
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        server {
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+        }
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+            workingDirectory project.file('run-data')
+
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+        maven { url = "https://jitpack.io" }
+        maven { url = 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url = 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
+        maven { url = 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://repo.lucko.me/' }
+        maven { url "https://repo.aikar.co/content/groups/aikar/" }
+        maven { url "https://maven.envyware.co.uk/releases"}
+        maven { url = 'https://repo.spongepowered.org/maven'}
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+	implementation 'pixelmon:Pixelmon-1.20.1-9.2.2-server:9.2.2'
+
+//    shadow 'mysql:mysql-connector-java:8.0.+'
+
+//    shadow group: 'com.zaxxer', name: 'HikariCP', version: '4.0.1'
+
+    implementation group: 'org.spongepowered', name: 'configurate-yaml', version: '4.0.0'
+
+    shadow group: 'com.cronutils', name: 'cron-utils', version: '9.2.0'
+
+    shadow group: 'com.envyful.api', name: 'commons', version: '5.1.7'
+    shadow (group: 'com.envyful.api', name: 'forge20', version: '5.1.7') {
+        transitive = false;
+    }
+    shadow (group: 'com.envyful.api', name: 'reforged20', version: '5.1.7') {
+        transitive = false;
+    }
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [
+            minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+            forge_version: forge_version, forge_version_range: forge_version_range,
+            loader_version_range: loader_version_range,
+            mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors: mod_authors, mod_description: mod_description,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : mod_authors,
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : mod_authors,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+
+    finalizedBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+    setArchiveClassifier('')
+    setArchiveBaseName("${rootProject.name}-Forge")
+
+    relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
+    relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
+    relocate('io.leangen.geantyref', 'com.github.lileep.pixelmonbank.shade.geantyref')
+    relocate('com.google.gson', 'com.github.lileep.pixelmonbank.shade.gson')
+    relocate('com.zaxxer', 'com.github.lileep.pixelmonbank.shade.hikari')
+    relocate('org.slf4j', 'com.github.lileep.pixelmonbank.shade.slf4j')
+    relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
+    relocate('org.bstats', 'com.github.lileep.pixelmonbank.shade.bstats')
+    relocate('com.google.common', 'com.github.lileep.pixelmonbank.shade.guava')
+    relocate('org.apache.logging', 'com.github.lileep.pixelmonbank.shade.log4j')
+    relocate('io.netty', 'com.github.lileep.pixelmonbank.shade.netty')
+    relocate('io.lettuce', 'com.github.lileep.pixelmonbank.shade.lettuce')
+    relocate('com.cronutils', 'com.github.lileep.pixelmonbank.shade.cronutils')
+    relocate('com.cronutils', 'com.github.lileep.pixelmonbank.shade.cronutils')
+    relocate('com.sun.el', 'com.github.lileep.pixelmonbank.shade.sun.el')
+    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
+    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
+    relocate('org.reactivestreams', 'com.github.lileep.pixelmonbank.shade.reactivestreams')
+    relocate('reactor', 'com.github.lileep.pixelmonbank.shade.reactor')
+
+    exclude "**/module-info.class"
+    exclude "**/*.properties"
+    exclude "**/*.xml"
+    exclude "META-INF/versions/9/**"
+    exclude "META-INF/native-image/**"
+    exclude "META-INF/services/**"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+task versionedRelease(type: Copy) {
+    dependsOn('shadowJar')
+    delete fileTree('../release/') {
+        include '**/*.jar'
+    }
+    group "build"
+    from("./build/libs/${rootProject.name}-Forge-${version}.jar")
+    into('../release/')
+    include '*.jar'
+    rename { String filename ->
+        filename.replace("-${version}.jar", "-${project.version}-${forgeVersion}.jar")
+    }
+}
+
+jar.finalizedBy('shadowJar')
+shadowJar.finalizedBy('reobfJar')
+build.finalizedBy('versionedRelease')
