@@ -411,7 +411,6 @@ public class PokemonBean extends Pokemon {
             ribbonList.appendTag(new NBTTagString(ribbon.toString()));
         }
         nbt.setTag(NbtKeys.RIBBONS, ribbonList);
-        System.out.println("minior data send: " + nbt.getByte(NbtKeys.STATS_MINIOR));
         return nbt;
     }
 
@@ -554,12 +553,17 @@ public class PokemonBean extends Pokemon {
             String paletteAndForm = palette;
             //Some mons have their form go first
             String formAndPalette = palette;
-            if (!"".equals(form)) {
-                paletteAndForm += ("_" + form);
-                formAndPalette = form + "_" + formAndPalette;
+            if (!form.isEmpty()) {
+                if ("none".equals(palette) || "normal".equals(palette)) {
+                    paletteAndForm = formAndPalette = form;
+                } else {
+                    paletteAndForm += ("_" + form);
+                    formAndPalette = form + "_" + formAndPalette;
+                }
             }
             for (IEnumForm formElem : this.species.getPossibleForms(true)) {
-                if (paletteAndForm.equalsIgnoreCase(formElem.getName()) || formAndPalette.equalsIgnoreCase(formElem.getName())) {
+                String formElemName = formElem.getName();
+                if (paletteAndForm.equalsIgnoreCase(formElemName) || formAndPalette.equalsIgnoreCase(formElemName)) {
                     formByte = formElem.getForm();
                     break;
                 }
@@ -593,9 +597,24 @@ public class PokemonBean extends Pokemon {
                 }
             }
 
+            System.out.println("Pokemon form name: " + pokemonForm.getName() + ", suffix: " + pokemonForm.getFormSuffix());
+
             String palette = pokemonForm.getFormSuffix().toLowerCase();
             if (palette.startsWith("-")) {
                 palette = palette.substring(1);
+            }
+
+            //alola and galar pokemons have special suffix
+            switch (palette) {
+                case "alola":
+                    nbt.setString(NbtKeys.FORM, "alolan");
+                    return;
+                case "galar":
+                    nbt.setString(NbtKeys.FORM, "galarian");
+                    return;
+                case "hisuian":
+                    nbt.setString(NbtKeys.FORM, palette);
+                    return;
             }
 
             //Intelligent override shiny
