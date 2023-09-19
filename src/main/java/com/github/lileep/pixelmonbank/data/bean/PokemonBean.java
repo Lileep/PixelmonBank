@@ -511,6 +511,7 @@ public class PokemonBean extends Pokemon {
         String form = nbt.getString(NbtKeys.FORM);
         String palette = nbt.getString("palette");
         byte formByte = 0;
+        boolean isShiny = "shiny".equals(nbt.getString("palette"));
         if (this.species.is(EnumSpecies.Minior)) {
             //If there's no color in palette(like shiny case), by default give it a random one
             byte colorIndex = (byte) RandomHelper.getRandomNumberBetween(0, EnumMinior.values().length - 1);
@@ -540,6 +541,40 @@ public class PokemonBean extends Pokemon {
             if (this.getExtraStats() != null) {
                 ((DeoxysStats) this.extraStats).setSus(formByte == EnumDeoxys.Sus.getForm());
             }
+        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Mareep, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Unfezant, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Greninja, EnumSpecies.Floette, EnumSpecies.Furfrou, EnumSpecies.Aegislash, EnumSpecies.Xerneas, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Minior, EnumSpecies.Mimikyu, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Wooloo, EnumSpecies.Dubwool, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
+            //No Deoxys here
+            for (IEnumForm formElem : this.species.getPossibleForms(true)) {
+                if (form.equalsIgnoreCase(formElem.getName())) {
+                    formByte = formElem.getForm();
+                    break;
+                }
+            }
+        } else if (this.species.is(EnumSpecies.Mareep, EnumSpecies.Wooloo, EnumSpecies.Dubwool)) {
+            //Not 'none' in 1.12
+            String formStr = "normal";
+            if ("shorn".equals(form)) {
+                formStr = form;
+            } else {
+                if (!"shiny".equals(palette)) {
+                    formStr = palette;
+                }
+            }
+            for (IEnumForm formElem : this.species.getPossibleForms(true)) {
+                if (formStr.equalsIgnoreCase(formElem.getName())) {
+                    formByte = formElem.getForm();
+                    break;
+                }
+            }
+        } else if (this.species.is(EnumSpecies.Floette)) {
+            //Shiny Floette has a shiny suffix instead of a whole shiny palette, e.g. 'yellowshiny'
+            isShiny = palette.endsWith("shiny");
+            String formStr = "az".equals(form) ? form : (isShiny ? palette.replace("shiny", "") : palette);
+            for (IEnumForm formElem : this.species.getPossibleForms(true)) {
+                if (formStr.equalsIgnoreCase(formElem.getName())) {
+                    formByte = formElem.getForm();
+                    break;
+                }
+            }
         } else {
             if (this.species.is(EnumSpecies.Meltan)) {
                 //Deal with extra stats
@@ -549,6 +584,8 @@ public class PokemonBean extends Pokemon {
             }
 
             //Process form name to 1.12 format
+
+            //Xerneas and regional forms don't need to be special judged here.
 
             String paletteAndForm = palette;
             //Some mons have their form go first
@@ -561,6 +598,15 @@ public class PokemonBean extends Pokemon {
                     formAndPalette = form + "_" + formAndPalette;
                 }
             }
+            //Judge simple one
+            for (IEnumForm formElem : this.species.getPossibleForms(true)) {
+                String formElemName = formElem.getName();
+                if (form.equalsIgnoreCase(formElemName) || palette.equalsIgnoreCase(formElemName)) {
+                    formByte = formElem.getForm();
+                    break;
+                }
+            }
+            //Judge combined one
             for (IEnumForm formElem : this.species.getPossibleForms(true)) {
                 String formElemName = formElem.getName();
                 if (paletteAndForm.equalsIgnoreCase(formElemName) || formAndPalette.equalsIgnoreCase(formElemName)) {
@@ -571,7 +617,7 @@ public class PokemonBean extends Pokemon {
         }
         this.dsForm.set(this, formByte);
         //1.16 shiny compatible
-        this.setShiny("shiny".equals(nbt.getString("palette")));
+        this.setShiny(isShiny);
     }
 
     private void writeToNBTSpecialMons(NBTTagCompound nbt) {
@@ -581,15 +627,43 @@ public class PokemonBean extends Pokemon {
                 pokemonForm = pokemonForm.getDefaultFromTemporary(this);
             }
         }
-        //Deoxys, Minior and Meltan need to be judged
+        //Some mons need to be judged
         if (this.species.is(EnumSpecies.Minior)) {
             byte colorIndex = ((MiniorStats) this.getExtraStats()).color;
             if (!"shiny".equals(nbt.getString("palette"))) {
                 nbt.setString("palette", EnumMinior.values()[colorIndex + 1].getName().toLowerCase());
             }
             nbt.setString(NbtKeys.FORM, pokemonForm == EnumMinior.METEOR ? "meteor" : "core");
-        } else if (this.species.is(EnumSpecies.Deoxys)) {
+        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Mareep, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Deoxys, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Unfezant, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Greninja, EnumSpecies.Floette, EnumSpecies.Furfrou, EnumSpecies.Aegislash, EnumSpecies.Xerneas, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Minior, EnumSpecies.Mimikyu, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Wooloo, EnumSpecies.Dubwool, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
+            //Rapidash, Porygon, Kecleon, Weavile, Zoroark, Solgaleo don't need to be judged
             nbt.setString(NbtKeys.FORM, pokemonForm.getName().toLowerCase());
+        } else if (this.species.is(EnumSpecies.Xerneas)) {
+            if (pokemonForm.getName().toLowerCase().endsWith("creator")) {
+                nbt.setString("palette", "creator");
+            }
+            nbt.setString(NbtKeys.FORM, pokemonForm.getSpriteSuffix("shiny".equals(nbt.getString("palette"))).toLowerCase().substring(1));
+        } else if (this.species.is(EnumSpecies.Aegislash)) {
+            if (pokemonForm.getName().toLowerCase().endsWith("alter")) {
+                nbt.setString("palette", "alter");
+            }
+            nbt.setString(NbtKeys.FORM, pokemonForm.getName().toLowerCase().startsWith("shield") ? "sheild" : "blade");
+        } else if (this.species.is(EnumSpecies.Mareep, EnumSpecies.Wooloo, EnumSpecies.Dubwool)) {
+            String lowerFormName = pokemonForm.getName().toLowerCase();
+            if ("shorn".equals(lowerFormName)) {
+                //By default, nbt.setString("palette", "none"); is done
+                nbt.setString(NbtKeys.FORM, lowerFormName);
+            } else {
+                if (!"normal".equals(lowerFormName) && !"shiny".equals(nbt.getString("palette"))) {
+                    nbt.setString("palette", lowerFormName);
+                }
+            }
+        } else if (this.species.is(EnumSpecies.Floette)) {
+            String lowerFormName = pokemonForm.getName().toLowerCase();
+            if ("az".equals(lowerFormName)) {
+                nbt.setString(NbtKeys.FORM, lowerFormName);
+            } else {
+                nbt.setString("palette", lowerFormName + ("shiny".equals(nbt.getString("palette")) ? "shiny" : ""));
+            }
         } else {
             if (this.species.is(EnumSpecies.Meltan)) {
                 if (this.getExtraStats() != null) {
@@ -597,14 +671,12 @@ public class PokemonBean extends Pokemon {
                 }
             }
 
-            System.out.println("Pokemon form name: " + pokemonForm.getName() + ", suffix: " + pokemonForm.getFormSuffix());
-
             String palette = pokemonForm.getFormSuffix().toLowerCase();
             if (palette.startsWith("-")) {
                 palette = palette.substring(1);
             }
 
-            //alola and galar pokemons have special suffix
+            //regional pokemons have special suffix
             switch (palette) {
                 case "alola":
                     nbt.setString(NbtKeys.FORM, "alolan");
@@ -613,6 +685,7 @@ public class PokemonBean extends Pokemon {
                     nbt.setString(NbtKeys.FORM, "galarian");
                     return;
                 case "hisuian":
+                case "paldean":
                     nbt.setString(NbtKeys.FORM, palette);
                     return;
             }
