@@ -691,11 +691,14 @@ public class PokemonBean extends Pokemon {
             }
 
             //Intelligent override shiny
-            if (!"normal".equals(palette) && !"none".equals(palette)) {
+            if (!"normal".equals(palette) && !"none".equals(palette) && !palette.isEmpty()) {
                 nbt.setString("palette", palette);
-                //Process form name, trim '_' and '-'
-                String variant = pokemonForm.getName().toLowerCase().replace(palette, "").replaceAll("^_+|_+$", "").replaceAll("^-+|-+$", "");
-                nbt.setString(NbtKeys.FORM, variant);
+                String formName = pokemonForm.getName();
+                if (!"NoForm".equals(formName)) {
+                    //Process form name, trim '_' and '-'
+                    String variant = formName.toLowerCase().replace(palette, "").replaceAll("^_+|_+$", "").replaceAll("^-+|-+$", "");
+                    nbt.setString(NbtKeys.FORM, variant);
+                }
             }
         }
     }
