@@ -23,9 +23,9 @@ public class PixelmonBankLocaleConfig {
     public static String cfgAllowUntradeable = "Whether to allow untradeable pixelmons to be sent to Pixelmon Bank";
     public static String cfgSterializeWhenWithDraw = "Whether to set the pokemon to be unbreedable when withdraw";
     public static String cfgUntradifyWhenWithdraw = "Whether to set the pokemon to be untradeable when withdraw";
-    public static String cfgRestrictList = "Listed pixelmons will be limited in a specified amount when sent to Pixelmon Bank(Comma separate)";
+    public static String cfgRestrictList = "Listed pixelmons will be limited in a specified amount when sent to Pixelmon Bank. Start a new line to add new pokemon";
     public static String cfgRestrictCount = "The limit of pixelmons in the restrict list";
-    public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
+    public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank. Start a new line to add new pokemon";
     public static String cfgAllowItem = "Whether to allow pixelmons that held items to be sent to Pixelmon Bank";
     public static String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
     public static String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
