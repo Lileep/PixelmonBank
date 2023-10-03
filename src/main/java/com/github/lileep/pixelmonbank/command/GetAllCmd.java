@@ -67,6 +67,9 @@ public class GetAllCmd {
         if (PixelmonBankConfig.UNTRADIFY_WHEN_WITHDRAW) {
             pokemonList.forEach(p->p.addSpecFlag("untradeable"));
         }
+        if (PixelmonBankConfig.RESET_FRIENDSHIP_WHEN_WITHDRAW) {
+            pokemonList.forEach(p->p.setFriendship(p.getBaseStats().getBaseFriendship()));
+        }
     }
 
     private boolean checkAndUpdateRestricts(List<Pokemon> pokemonList, String playerUUID) {

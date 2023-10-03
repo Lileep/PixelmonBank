@@ -21,8 +21,9 @@ public class PixelmonBankLocaleConfig {
     public static String cfgAllowUltraBeast = "Whether to allow ultra beasts to be sent to Pixelmon Bank";
     public static String cfgAllowEgg = "Whether to allow eggs to be sent to Pixelmon Bank";
     public static String cfgAllowUntradeable = "Whether to allow untradeable pixelmons to be sent to Pixelmon Bank";
-    public static String cfgSterializeWhenWithDraw = "Whether to set the pokemon to be unbreedable when withdraw";
-    public static String cfgUntradifyWhenWithdraw = "Whether to set the pokemon to be untradeable when withdraw";
+    public static String cfgSterializeWhenWithDraw = "Whether to set the pokemon to be unbreedable when withdrawn";
+    public static String cfgUntradifyWhenWithdraw = "Whether to set the pokemon to be untradeable when withdrawn";
+    public static String cfgResetFriendshipWhenWithdraw = "Whether to reset the pokemon's friendship when withdrawn";
     public static String cfgRestrictList = "Listed pixelmons will be limited in a specified amount when sent to Pixelmon Bank. Start a new line to add new pokemon";
     public static String cfgRestrictCount = "The limit of pixelmons in the restrict list";
     public static String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank. Start a new line to add new pokemon";

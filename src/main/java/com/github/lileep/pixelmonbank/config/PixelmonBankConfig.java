@@ -14,6 +14,7 @@ public class PixelmonBankConfig {
     public static boolean ALLOW_UNTRADEABLE = false;
     public static boolean STERILIZE_WHEN_WITHDRAW = false;
     public static boolean UNTRADIFY_WHEN_WITHDRAW = false;
+    public static boolean RESET_FRIENDSHIP_WHEN_WITHDRAW = false;
     public static String[] RESTRICT_LIST = new String[0];
     public static int RESTRICT_COUNT = 1;
     public static String[] BLACK_LIST = new String[0];
@@ -66,6 +67,7 @@ public class PixelmonBankConfig {
         ALLOW_UNTRADEABLE = config.get(category, "allow_untradeable", ALLOW_UNTRADEABLE, PixelmonBankLocaleConfig.cfgAllowUntradeable).getBoolean();
         STERILIZE_WHEN_WITHDRAW = config.get(category, "sterialize_when_withdraw", STERILIZE_WHEN_WITHDRAW, PixelmonBankLocaleConfig.cfgSterializeWhenWithDraw).getBoolean();;
         UNTRADIFY_WHEN_WITHDRAW = config.get(category, "untradify_when_withdraw", UNTRADIFY_WHEN_WITHDRAW, PixelmonBankLocaleConfig.cfgUntradifyWhenWithdraw).getBoolean();;
+        RESET_FRIENDSHIP_WHEN_WITHDRAW = config.get(category, "reset_friendship_when_withdraw", RESET_FRIENDSHIP_WHEN_WITHDRAW, PixelmonBankLocaleConfig.cfgResetFriendshipWhenWithdraw).getBoolean();;
         RESTRICT_LIST = config.get(category, "restrict_list", RESTRICT_LIST, PixelmonBankLocaleConfig.cfgRestrictList).getStringList();
         for (int i = 0; i < RESTRICT_LIST.length; i++) {
             RESTRICT_LIST[i] = RESTRICT_LIST[i].toLowerCase();

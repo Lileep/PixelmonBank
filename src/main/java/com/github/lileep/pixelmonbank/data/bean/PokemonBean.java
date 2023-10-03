@@ -286,6 +286,7 @@ public class PokemonBean extends Pokemon {
         }
         if (nbt.hasKey(NbtKeys.DISPLAY_RIBBON)) {
             String disp = nbt.getString(NbtKeys.DISPLAY_RIBBON);
+            //TODO: Support "NONE"
             this.displayedRibbon = disp == "" ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp);
         }
         if (nbt.hasKey(NbtKeys.RIBBONS)) {

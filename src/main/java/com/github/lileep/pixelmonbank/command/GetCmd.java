@@ -92,6 +92,9 @@ public class GetCmd {
         if (PixelmonBankConfig.UNTRADIFY_WHEN_WITHDRAW) {
             pokemon.addSpecFlag("untradeable");
         }
+        if (PixelmonBankConfig.RESET_FRIENDSHIP_WHEN_WITHDRAW) {
+            pokemon.setFriendship(pokemon.getBaseStats().getBaseFriendship());
+        }
     }
 
     private boolean checkAndUpdateRestrict(Pokemon pokemon, String playerUUID) {
