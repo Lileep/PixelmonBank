@@ -8,18 +8,15 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
 import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Command(
@@ -71,11 +68,8 @@ public class GetCmd {
 //        }
 
         //Remove success
-        if (SyncHandler.getInstance().updateTotal(-1, uuid) &&
-                checkAndUpdateRestrict(pokemon, uuid) &&
-                SyncHandler.getInstance().delOne(id, uuid)) {
-
-            operatePokemon(pokemon);
+        if (SyncHandler.getInstance().delOne(id, uuid)) {
+            PokemonOptUtil.operatePokemon(pokemon);
             sStorage.add(pokemon);
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName()), sender.getGameProfile().getId());
         }
@@ -84,29 +78,5 @@ public class GetCmd {
 //        if (Optional.ofNullable(server.getPlayerList().getPlayerByUsername(sender.getName())).isPresent()) {
 //        }
 
-    }
-
-    private void operatePokemon(Pokemon pokemon) {
-        PixelmonBankConfig pbkConfig = PixelmonBank.getInstance().getConfig();
-        if (pbkConfig.isSterilizeWhenWithdraw()) {
-            pokemon.addFlag("unbreedable");
-        }
-        if (pbkConfig.isUntradifyWhenWithdraw()) {
-            pokemon.addFlag("untradeable");
-        }
-        if (pbkConfig.isResetFriendshipWhenWithdraw()) {
-            pokemon.setFriendship(pokemon.getForm().getSpawn().getBaseFriendship());
-        }
-    }
-
-    private boolean checkAndUpdateRestrict(Pokemon pokemon, String playerUUID) {
-        PixelmonBankConfig pbkConfig = PixelmonBank.getInstance().getConfig();
-        if (pbkConfig.getRestrictList().length > 0) {
-            List<String> restrictList = Arrays.asList(pbkConfig.getRestrictList());
-            if (restrictList.contains(pokemon.getLocalizedName().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getName().toLowerCase())) {
-                return SyncHandler.getInstance().updateRestrictCount(-1, playerUUID);
-            }
-        }
-        return true;
     }
 }

@@ -15,9 +15,9 @@ import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.data.serializer.PixelmonSerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.database.PixelmonBankQueries;
-import com.github.lileep.pixelmonbank.event.PbkEventHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.Reference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,6 +32,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
 
 @Mod(Reference.MOD_ID)
 public class PixelmonBank {
@@ -64,6 +66,8 @@ public class PixelmonBank {
         try {
             this.config = YamlConfigFactory.getInstance(PixelmonBankConfig.class);
             this.locale = YamlConfigFactory.getInstance(PixelmonBankLocaleConfig.class);
+            PokemonOptUtil.RESTRICT_POKEMONS = new HashSet<>(Arrays.asList(this.config.getRestrictList()));
+            PokemonOptUtil.BLACK_LIST_POKEMONS = new HashSet<>(Arrays.asList(this.config.getBlackList()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,12 +87,10 @@ public class PixelmonBank {
 
             try (Connection connection = this.database.getConnection();
                  PreparedStatement createDB = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_DB, getConfig().getDatabase().getDatabase()));
-                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, getConfig().getDatabase().getDatabase()));
-                 PreparedStatement createPlayerInfoTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PLAYER_TABLE, getConfig().getDatabase().getDatabase()))
+                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, getConfig().getDatabase().getDatabase()))
             ) {
                 createDB.executeUpdate();
                 createPbkTable.executeUpdate();
-                createPlayerInfoTable.executeUpdate();
                 checkAndUpdateDB(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -107,6 +109,7 @@ public class PixelmonBank {
             int timePointIndex = -1;
             int visibleIndex = -1;
             int withdrawTimeIndex = -1;
+            int pixelmonNameIndex = -1;
             int index = 0;
             while (rs.next()) {
                 String columnName = rs.getString("Field");
@@ -118,6 +121,8 @@ public class PixelmonBank {
                     visibleIndex = index;
                 } else if ("withdraw_time".equals(columnName)) {
                     withdrawTimeIndex = index;
+                } else if ("pixelmon_name".equals(columnName)) {
+                    pixelmonNameIndex = index;
                 }
                 index++;
             }
@@ -155,6 +160,16 @@ public class PixelmonBank {
                     addWithdrawTime.executeUpdate();
                 }
             }
+
+            //Add pixelmon name column and its index
+            if (pixelmonNameIndex == -1) {
+                try (PreparedStatement addPixelmonName = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME, getConfig().getDatabase().getDatabase()));
+                     PreparedStatement addPixelmonNameIndex = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME_INDEX, getConfig().getDatabase().getDatabase()))
+                ) {
+                    addPixelmonName.executeUpdate();
+                    addPixelmonNameIndex.executeUpdate();
+                }
+            }
             LOGGER.info("DB checking done!");
 
         } catch (SQLException e) {
@@ -165,7 +180,6 @@ public class PixelmonBank {
     @SubscribeEvent
     public void init(final FMLServerStartingEvent event) {
         SyncHandler.getInstance().register(new PixelmonSerializer());
-        MinecraftForge.EVENT_BUS.register(PbkEventHandler.class);
     }
 
     @SubscribeEvent
