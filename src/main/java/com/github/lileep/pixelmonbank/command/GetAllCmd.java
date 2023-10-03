@@ -67,6 +67,9 @@ public class GetAllCmd {
         if (pbkConfig.isUntradifyWhenWithdraw()) {
             pokemonList.forEach(p->p.addFlag("untradeable"));
         }
+        if (pbkConfig.isResetFriendshipWhenWithdraw()) {
+            pokemonList.forEach(p->p.setFriendship(p.getForm().getSpawn().getBaseFriendship()));
+        }
     }
 
     private boolean checkAndUpdateRestricts(List<Pokemon> pokemonList, String playerUUID) {

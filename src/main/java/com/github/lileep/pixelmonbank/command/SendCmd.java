@@ -129,7 +129,7 @@ public class SendCmd {
                 }
             }
 
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessSendMsg(), pokemon.getDisplayName()), sender.getGameProfile().getId());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessSendMsg(), pokemon.getFormattedDisplayName()), sender.getGameProfile().getId());
         }
     }
 

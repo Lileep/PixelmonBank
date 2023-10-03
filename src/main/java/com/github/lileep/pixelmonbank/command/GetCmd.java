@@ -77,7 +77,7 @@ public class GetCmd {
 
             operatePokemon(pokemon);
             sStorage.add(pokemon);
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getDisplayName()), sender.getGameProfile().getId());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName()), sender.getGameProfile().getId());
         }
 
         //Judge online and send success msg
@@ -93,6 +93,9 @@ public class GetCmd {
         }
         if (pbkConfig.isUntradifyWhenWithdraw()) {
             pokemon.addFlag("untradeable");
+        }
+        if (pbkConfig.isResetFriendshipWhenWithdraw()) {
+            pokemon.setFriendship(pokemon.getForm().getSpawn().getBaseFriendship());
         }
     }
 
