@@ -1,9 +1,11 @@
 package com.github.lileep.pixelmonbank.config;
 
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class PixelmonBankConfig {
     public static Configuration config;
@@ -72,12 +74,14 @@ public class PixelmonBankConfig {
         for (int i = 0; i < RESTRICT_LIST.length; i++) {
             RESTRICT_LIST[i] = RESTRICT_LIST[i].toLowerCase();
         }
+        PokemonOptUtil.RESTRICT_POKEMONS = new HashSet<>(Arrays.asList(RESTRICT_LIST));
         RESTRICT_COUNT = config.get(category, "restrict_count", RESTRICT_COUNT, PixelmonBankLocaleConfig.cfgRestrictCount).getInt();
 
         BLACK_LIST = config.get(category, "black_list", BLACK_LIST, PixelmonBankLocaleConfig.cfgBlackList).getStringList();
         for (int i = 0; i < BLACK_LIST.length; i++) {
             BLACK_LIST[i] = BLACK_LIST[i].toLowerCase();
         }
+        PokemonOptUtil.BLACK_LIST_POKEMONS = new HashSet<>(Arrays.asList(BLACK_LIST));
 
         ALLOW_ITEM = config.get(category, "allow_item", ALLOW_ITEM, PixelmonBankLocaleConfig.cfgAllowItem).getBoolean();;
         BLACK_LIST_ITEM = config.get(category, "black_list_item", BLACK_LIST_ITEM, PixelmonBankLocaleConfig.cfgBlackListItem).getStringList();
@@ -91,13 +95,7 @@ public class PixelmonBankConfig {
 //            BLACK_LIST_MOVE[i] = BLACK_LIST_MOVE[i].toLowerCase().replaceAll("\\s*", "");
 //        }
 
-        Property maxIvs = config.get(category, "max_ivs", MAX_IVS, PixelmonBankLocaleConfig.cfgMaxIvs);
-        if (maxIvs.getInt() > 6) {
-            maxIvs.set(6);
-        } else if (maxIvs.getInt() < 0) {
-            maxIvs.set(0);
-        }
-        MAX_IVS = maxIvs.getInt();
+        MAX_IVS = Math.min((Math.max(config.get(category, "max_ivs", MAX_IVS, PixelmonBankLocaleConfig.cfgMaxIvs).getInt(), 0)), 6);
         COUNT_HYPER_TRAINED = config.get(category, "count_hyper_trained", COUNT_HYPER_TRAINED, PixelmonBankLocaleConfig.cfgCountHyperTrained).getBoolean();
 
         category = "database";

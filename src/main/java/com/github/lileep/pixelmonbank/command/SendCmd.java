@@ -13,11 +13,11 @@ import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.google.common.collect.Lists;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
-import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -39,7 +39,6 @@ public class SendCmd {
 
     @CommandProcessor
     public void run(@Sender EntityPlayerMP sender, @Argument String[] args) {
-
         if (args.length < 1) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
             return;
@@ -83,30 +82,31 @@ public class SendCmd {
 
         //Check part
         //Judge admin bypass
-        final boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
+        boolean bypass = Lists.newArrayList(args).contains("-f") && sender.canUseCommand(4, PermNodeReference.BYPASS_NODE);
 
-        //Check max count
-        int maxCount = PixelmonBankConfig.MAX_COUNT;
-        if (maxCount > 0 && maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.reachMax, maxCount));
-            return;
-        }
+        if (!bypass) {
+            //Check max count
+            int maxCount = PixelmonBankConfig.MAX_COUNT;
+            if (maxCount > 0 && maxCount <= SyncHandler.getInstance().getTotal(sender.getGameProfile().getId().toString())) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.reachMax, maxCount));
+                return;
+            }
+            //Check untradeable
+            if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable")) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
+                return;
+            }
 
-        //Check untradeable
-        if (!PixelmonBankConfig.ALLOW_UNTRADEABLE && pokemon.hasSpecFlag("untradeable") && !bypass) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUntradeable));
-            return;
-        }
+            //Check whether the last pokemon in team is an egg
+            if (sStorage.getTeam().size() == 1 && !pokemon.isEgg()) {
+                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
+                return;
+            }
 
-        //Check whether the last pokemon in team is an egg
-        if (sStorage.getTeam().size() == 1 && !pokemon.isEgg() && !bypass) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.partyLastOne));
-            return;
-        }
-
-        //Check other things
-        if (!validatePixelmon(pokemon, sender)) {
-            return;
+            //Check other things
+            if (!validatePixelmon(pokemon, sender)) {
+                return;
+            }
         }
 
         //retrieve all pixelmons
@@ -115,18 +115,9 @@ public class SendCmd {
         //Send logic
         EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
         String uuid = player.getUuid().toString();
-        if (SyncHandler.getInstance().sendOne(uuid, pokemon) &&
-                SyncHandler.getInstance().updateTotal(1, uuid)) {
+        if (SyncHandler.getInstance().sendOne(uuid, pokemon)) {
             //Delete player's pixelmon
             sStorage.set(slot - 1, null);
-
-            //Restrict Amount sync
-            if (isRestrict(pokemon)) {
-                if (!SyncHandler.getInstance().updateRestrictCount(1, uuid)) {
-                    return;
-                }
-            }
-
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successSendMsg, pokemon.getDisplayName()));
         }
     }
@@ -146,13 +137,10 @@ public class SendCmd {
         } else if (!PixelmonBankConfig.ALLOW_ULTRABEAST && pokemon.getSpecies().isUltraBeast()) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noUltrabeast));
             return false;
-        } else if (PixelmonBankConfig.BLACK_LIST.length > 0) {
-            List<String> blackList = Arrays.asList(PixelmonBankConfig.BLACK_LIST);
-            if (blackList.contains(pokemon.getLocalizedName().toLowerCase()) || blackList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
-                sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
-                return false;
-            }
-        } else if (isRestrict(pokemon)) {
+        } else if (PokemonOptUtil.isBlackList(pokemon)) {
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
+            return false;
+        } else if (PokemonOptUtil.isRestrict(pokemon)) {
             int restrictCount = SyncHandler.getInstance().getRestrictCount(sender.getGameProfile().getId().toString());
             if (restrictCount >= PixelmonBankConfig.RESTRICT_COUNT) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noRestrictList, pokemon.getLocalizedName()));
@@ -196,23 +184,6 @@ public class SendCmd {
             }
         }
 
-//            sender.sendMessage(MsgHandler.prefixedColorMsg("has move? "+pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)));
-        //Check moves
-//            if (PixelmonBankConfig.BLACK_LIST_MOVE.length > 0) {
-//                if (pokemon.getMoveset().hasAttack(PixelmonBankConfig.BLACK_LIST_MOVE)) {
-//                    sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.noBlackList, pokemon.getLocalizedName()));
-//                    return;
-//                }
-//            }
-
         return true;
-    }
-
-    private boolean isRestrict(Pokemon pokemon) {
-        if (PixelmonBankConfig.RESTRICT_LIST.length > 0) {
-            List<String> restrictList = Arrays.asList(PixelmonBankConfig.RESTRICT_LIST);
-            return restrictList.contains(pokemon.getLocalizedName().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getPokemonName().toLowerCase());
-        }
-        return false;
     }
 }

@@ -8,18 +8,16 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Command(
@@ -71,10 +69,8 @@ public class GetCmd {
 //        }
 
         //Remove success
-        if (SyncHandler.getInstance().updateTotal(-1, uuid) &&
-                checkAndUpdateRestrict(pokemon, uuid) &&
-                SyncHandler.getInstance().delOne(id, uuid)) {
-            operatePokemon(pokemon);
+        if (SyncHandler.getInstance().delOne(id, uuid)) {
+            PokemonOptUtil.operatePokemon(pokemon);
             sStorage.add(pokemon);
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successGetMsg, pokemon.getDisplayName()));
         }
@@ -83,27 +79,5 @@ public class GetCmd {
 //        if (Optional.ofNullable(server.getPlayerList().getPlayerByUsername(sender.getName())).isPresent()) {
 //        }
 
-    }
-
-    private void operatePokemon(Pokemon pokemon) {
-        if (PixelmonBankConfig.STERILIZE_WHEN_WITHDRAW) {
-            pokemon.addSpecFlag("unbreedable");
-        }
-        if (PixelmonBankConfig.UNTRADIFY_WHEN_WITHDRAW) {
-            pokemon.addSpecFlag("untradeable");
-        }
-        if (PixelmonBankConfig.RESET_FRIENDSHIP_WHEN_WITHDRAW) {
-            pokemon.setFriendship(pokemon.getBaseStats().getBaseFriendship());
-        }
-    }
-
-    private boolean checkAndUpdateRestrict(Pokemon pokemon, String playerUUID) {
-        if (PixelmonBankConfig.RESTRICT_LIST.length > 0) {
-            List<String> restrictList = Arrays.asList(PixelmonBankConfig.RESTRICT_LIST);
-            if (restrictList.contains(pokemon.getLocalizedName().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
-                return SyncHandler.getInstance().updateRestrictCount(-1, playerUUID);
-            }
-        }
-        return true;
     }
 }

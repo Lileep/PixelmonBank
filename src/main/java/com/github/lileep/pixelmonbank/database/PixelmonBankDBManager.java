@@ -25,13 +25,14 @@ public class PixelmonBankDBManager {
         return instance;
     }
 
-    public int sendOne(String playerUUID, DataPack dataPack) {
+    public int sendOne(String playerUUID, DataPack dataPack, String pokemonName) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SEND_ONE, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setBlob(2, dataPack.toStream());
             statement.setString(3, PixelmonBankConfig.SERVER_NAME);
+            statement.setString(4, pokemonName);
             return statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,7 +84,7 @@ public class PixelmonBankDBManager {
 //        List<DataPack> packList = new ArrayList<>();
         Map<Integer, DataPack> packMap = new LinkedHashMap<>();
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL_PAGEABLE, PixelmonBankConfig.DB_DBNAME, PixelmonBankConfig.DB_DBNAME))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL_PAGEABLE, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             statement.setInt(2, pageStart);
@@ -127,21 +128,9 @@ public class PixelmonBankDBManager {
         return 0;
     }
 
-    public int resetPlayerInfo(String playerUUID) {
+    public int getTotal(String playerUUID) {
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.RESET_PLAYER_INFO, PixelmonBankConfig.DB_DBNAME))
-        ) {
-            statement.setString(1, playerUUID);
-            return statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getPlayerInfo(String info, String playerUUID) {
-        try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, info, PixelmonBankConfig.DB_DBNAME))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_TOTAL, PixelmonBankConfig.DB_DBNAME))
         ) {
             statement.setString(1, playerUUID);
             ResultSet resultSet = statement.executeQuery();
@@ -151,19 +140,22 @@ public class PixelmonBankDBManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
-    public int updatePlayerInfo(String info, int amount, String playerUUID) {
+    public List<String> getPokemonNames(String playerUUID) {
+        List<String> pokemonNames = new ArrayList<>();
         try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.UPDATE_PLAYER_INFO, PixelmonBankConfig.DB_DBNAME, info, info))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_POKEMON_NAMES, PixelmonBankConfig.DB_DBNAME))
         ) {
-            statement.setInt(1, amount);
-            statement.setString(2, playerUUID);
-            return statement.executeUpdate();
+            statement.setString(1, playerUUID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                pokemonNames.add(resultSet.getString(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return pokemonNames;
     }
 }

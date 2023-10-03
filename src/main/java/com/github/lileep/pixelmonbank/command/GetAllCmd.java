@@ -7,17 +7,16 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,40 +50,10 @@ public class GetAllCmd {
         }
 
         //Remove success
-        if (SyncHandler.getInstance().updateTotal(-pokemonList.size(), uuid) &&
-                checkAndUpdateRestricts(pokemonList, uuid) &&
-                SyncHandler.getInstance().delAll(uuid)) {
-            operatePokemons(pokemonList);
+        if (SyncHandler.getInstance().delAll(uuid)) {
+            PokemonOptUtil.operatePokemons(pokemonList);
             pokemonList.forEach(sStorage::add);
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.successGetAllMsg));
         }
-    }
-
-    private void operatePokemons(List<Pokemon> pokemonList) {
-        if (PixelmonBankConfig.STERILIZE_WHEN_WITHDRAW) {
-            pokemonList.forEach(p->p.addSpecFlag("unbreedable"));
-        }
-        if (PixelmonBankConfig.UNTRADIFY_WHEN_WITHDRAW) {
-            pokemonList.forEach(p->p.addSpecFlag("untradeable"));
-        }
-        if (PixelmonBankConfig.RESET_FRIENDSHIP_WHEN_WITHDRAW) {
-            pokemonList.forEach(p->p.setFriendship(p.getBaseStats().getBaseFriendship()));
-        }
-    }
-
-    private boolean checkAndUpdateRestricts(List<Pokemon> pokemonList, String playerUUID) {
-        if (PixelmonBankConfig.RESTRICT_LIST.length > 0) {
-            List<String> restrictList = Arrays.asList(PixelmonBankConfig.RESTRICT_LIST);
-            int restrictAmount = 0;
-            for (Pokemon pokemon : pokemonList) {
-                if (restrictList.contains(pokemon.getLocalizedName().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getPokemonName().toLowerCase())) {
-                    restrictAmount ++;
-                }
-            }
-            if (restrictAmount > 0) {
-                return SyncHandler.getInstance().updateRestrictCount(-restrictAmount, playerUUID);
-            }
-        }
-        return true;
     }
 }

@@ -13,10 +13,8 @@ import com.github.lileep.pixelmonbank.data.serializer.PixelmonSerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.database.PixelmonBankQueries;
 import com.github.lileep.pixelmonbank.database.impl.PixelmonBankDatabase;
-import com.github.lileep.pixelmonbank.event.PbkEventHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.Reference;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -64,12 +62,10 @@ public class PixelmonBank {
 
             try (Connection connection = this.database.getConnection();
                  PreparedStatement createDB = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_DB, PixelmonBankConfig.DB_DBNAME));
-                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, PixelmonBankConfig.DB_DBNAME));
-                 PreparedStatement createPlayerInfoTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PLAYER_TABLE, PixelmonBankConfig.DB_DBNAME))
+                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, PixelmonBankConfig.DB_DBNAME))
             ) {
                 createDB.executeUpdate();
                 createPbkTable.executeUpdate();
-                createPlayerInfoTable.executeUpdate();
                 checkAndUpdateDB(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -78,8 +74,6 @@ public class PixelmonBank {
 
         PixelmonBankDBManager.getInstance();
         SyncHandler.getInstance().register(new PixelmonSerializer());
-
-        MinecraftForge.EVENT_BUS.register(PbkEventHandler.class);
     }
 
     private void checkAndUpdateDB(Connection connection) {
@@ -92,6 +86,7 @@ public class PixelmonBank {
             int timePointIndex = -1;
             int visibleIndex = -1;
             int withdrawTimeIndex = -1;
+            int pixelmonNameIndex = -1;
             int index = 0;
             while (rs.next()) {
                 String columnName = rs.getString("Field");
@@ -103,13 +98,15 @@ public class PixelmonBank {
                     visibleIndex = index;
                 } else if ("withdraw_time".equals(columnName)) {
                     withdrawTimeIndex = index;
+                } else if ("pixelmon_name".equals(columnName)) {
+                    pixelmonNameIndex = index;
                 }
                 index++;
             }
             //Remove the pixelmon_uuid column and add id column
             if (pixelmonUuidIndex != -1) {
-                try(PreparedStatement removePUuid = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_P_UUID, PixelmonBankConfig.DB_DBNAME));
-                    PreparedStatement addId = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_ID, PixelmonBankConfig.DB_DBNAME))
+                try (PreparedStatement removePUuid = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_P_UUID, PixelmonBankConfig.DB_DBNAME));
+                     PreparedStatement addId = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_ID, PixelmonBankConfig.DB_DBNAME))
                 ) {
                     removePUuid.executeUpdate();
                     addId.executeUpdate();
@@ -117,8 +114,8 @@ public class PixelmonBank {
             }
             //Rename time_point 2 send_time
             if (timePointIndex != -1) {
-                try(PreparedStatement removeTimePointIndex = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_TIME_POINT_INDEX, PixelmonBankConfig.DB_DBNAME));
-                    PreparedStatement renameTimePoint = connection.prepareStatement(String.format(PixelmonBankQueries.RENAME_TIME_POINT, PixelmonBankConfig.DB_DBNAME))
+                try (PreparedStatement removeTimePointIndex = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_TIME_POINT_INDEX, PixelmonBankConfig.DB_DBNAME));
+                     PreparedStatement renameTimePoint = connection.prepareStatement(String.format(PixelmonBankQueries.RENAME_TIME_POINT, PixelmonBankConfig.DB_DBNAME))
                 ) {
                     removeTimePointIndex.executeUpdate();
                     renameTimePoint.executeUpdate();
@@ -126,8 +123,8 @@ public class PixelmonBank {
             }
             //Remove the visible column
             if (visibleIndex != -1) {
-                try(PreparedStatement removeOldData = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_OLD_DATA, PixelmonBankConfig.DB_DBNAME));
-                    PreparedStatement removeVisible = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_VISIBLE, PixelmonBankConfig.DB_DBNAME))
+                try (PreparedStatement removeOldData = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_OLD_DATA, PixelmonBankConfig.DB_DBNAME));
+                     PreparedStatement removeVisible = connection.prepareStatement(String.format(PixelmonBankQueries.REMOVE_VISIBLE, PixelmonBankConfig.DB_DBNAME))
                 ) {
                     removeOldData.executeUpdate();
                     removeVisible.executeUpdate();
@@ -135,9 +132,19 @@ public class PixelmonBank {
             }
             //Add withdraw time column
             if (withdrawTimeIndex == -1) {
-                try(PreparedStatement addWithdrawTime = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_WITHDRAW_TIME, PixelmonBankConfig.DB_DBNAME))
+                try (PreparedStatement addWithdrawTime = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_WITHDRAW_TIME, PixelmonBankConfig.DB_DBNAME))
                 ) {
                     addWithdrawTime.executeUpdate();
+                }
+            }
+
+            //Add pixelmon name column and its index
+            if (pixelmonNameIndex == -1) {
+                try (PreparedStatement addPixelmonName = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME, PixelmonBankConfig.DB_DBNAME));
+                     PreparedStatement addPixelmonNameIndex = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME_INDEX, PixelmonBankConfig.DB_DBNAME))
+                ) {
+                    addPixelmonName.executeUpdate();
+                    addPixelmonNameIndex.executeUpdate();
                 }
             }
             LOGGER.info("DB checking done!");
@@ -151,33 +158,6 @@ public class PixelmonBank {
     public void onServerStart(final FMLServerStartingEvent event) {
         this.commandFactory.registerCommand(event.getServer(), new PixelmonBankCmd());
     }
-
-//    @SubscribeEvent
-//    public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-//        EntityPlayer player = event.player;
-//        UtilConcurrency.runAsync(() -> {
-//            try (Connection connection = PixelmonBank.instance.getDatabase().getConnection();
-//                 PreparedStatement getPlayerInfo = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, PixelmonBankConfig.DB_DBNAME))
-//            ) {
-//                getPlayerInfo.setString(1, player.getUniqueID().toString());
-//                ResultSet resultSet = getPlayerInfo.executeQuery();
-//                System.out.println("player info query done!");
-//                if (!resultSet.next()) {
-//                    System.out.println("player info has no next");
-//                    try(PreparedStatement initPlayerInfo = connection.prepareStatement(String.format(PixelmonBankQueries.INIT_PLAYER_INFO, PixelmonBankConfig.DB_DBNAME))) {
-//                        initPlayerInfo.setString(1, player.getUniqueID().toString());
-//                        System.out.println("player info inserted!");
-//                        if (initPlayerInfo.executeUpdate() > 0) {
-//                            LOGGER.info(String.format("Player %s doesn't have Pixelmon Bank records before, inited", player.getDisplayName().getFormattedText()));
-//                        }
-//                    }
-//                }
-//
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        });
-//    }
 
     public ForgePlayerManager getPlayerManager() {
         return playerManager;
