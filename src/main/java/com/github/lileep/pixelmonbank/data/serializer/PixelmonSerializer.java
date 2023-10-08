@@ -1,14 +1,15 @@
 package com.github.lileep.pixelmonbank.data.serializer;
 
-import com.github.lileep.pixelmonbank.data.bean.PokemonBean;
 import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
+import com.github.lileep.pixelmonbank.data.bean.PokemonBean;
 import com.github.lileep.pixelmonbank.lib.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.lang.reflect.Type;
@@ -52,7 +53,6 @@ public class PixelmonSerializer implements ISerializer {
         }
 
         List<Pokemon> pokemonList = new ArrayList<>();
-
         for (String key : map.keySet()) {
             NBTTagCompound nbtTagCompound;
             try {
@@ -63,7 +63,7 @@ public class PixelmonSerializer implements ISerializer {
 
 //                pokemonList.add(Pixelmon.pokemonFactory.create(nbtTagCompound));
                 pokemonList.add(Pixelmon.pokemonFactory.create(pokemonBean.writeToNBT(nbtTagCompound)));
-            } catch (Exception e) {
+            } catch (NBTException e) {
                 System.out.println("Failed to write nbt.");
                 return null;
             }

@@ -1,5 +1,7 @@
 package com.github.lileep.pixelmonbank.data.bean;
 
+import com.google.common.base.Enums;
+import com.google.common.collect.Maps;
 import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.RandomHelper;
 import com.pixelmonmod.pixelmon.api.moveskills.MoveSkill;
@@ -7,6 +9,8 @@ import com.pixelmonmod.pixelmon.api.pokemon.ISpecType;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonSpec;
 import com.pixelmonmod.pixelmon.api.pokemon.SpecFlag;
+import com.pixelmonmod.pixelmon.battles.attacks.Attack;
+import com.pixelmonmod.pixelmon.battles.attacks.AttackBase;
 import com.pixelmonmod.pixelmon.battles.status.StatusPersist;
 import com.pixelmonmod.pixelmon.config.PixelmonConfig;
 import com.pixelmonmod.pixelmon.config.RemapHandler;
@@ -21,19 +25,15 @@ import com.pixelmonmod.pixelmon.enums.items.EnumPokeballs;
 import com.pixelmonmod.pixelmon.storage.NbtKeys;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.datafix.FixTypes;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class PokemonBean extends Pokemon {
 
@@ -154,8 +154,10 @@ public class PokemonBean extends Pokemon {
         this.experience = nbt.getInteger(NbtKeys.EXP);
         this.setDoesLevel(nbt.getBoolean(NbtKeys.DOES_LEVEL));
         this.setFriendship(nbt.getShort(NbtKeys.FRIENDSHIP));
-        //TODO: Temporarily don't need to be changed
-        this.moveset.readFromNBT(nbt);
+
+        //Old one:
+//        this.moveset.readFromNBT(nbt);
+        this.readMoveset(nbt);
 
         //Special processing of defense → defence
         this.defenseTo1122(nbt);
@@ -254,16 +256,34 @@ public class PokemonBean extends Pokemon {
             this.eggCycles = null;
         }
         if (nbt.hasKey(NbtKeys.MOVE_SKILL_COOLDOWNS)) {
-            NBTTagCompound moveSkillCooldowns = nbt.getCompoundTag(NbtKeys.MOVE_SKILL_COOLDOWNS);
-            //TODO: There're differences between them
-            for (String moveSkillID : moveSkillCooldowns.getKeySet()) {
-                if (moveSkillID.endsWith("Most")) {
-                    moveSkillID = moveSkillID.substring(0, moveSkillID.length() - 4);
-                }
-                MoveSkill moveSkill = MoveSkill.getMoveSkillByID(moveSkillID);
+
+            //Old method:
+//            NBTTagCompound moveSkillCooldowns = nbt.getCompoundTag(NbtKeys.MOVE_SKILL_COOLDOWNS);
+//            for (String moveSkillID : moveSkillCooldowns.getKeySet()) {
+//                if (moveSkillID.endsWith("Most")) {
+//                    moveSkillID = moveSkillID.substring(0, moveSkillID.length() - 4);
+//                }
+//                MoveSkill moveSkill = MoveSkill.getMoveSkillByID(moveSkillID);
+//                if (moveSkill != null) {
+//                    UUID cooldown = moveSkillCooldowns.getUniqueId(moveSkill.id);
+//                    this.moveSkillCooldownData.put(moveSkill.id, new Tuple<>(cooldown.getMostSignificantBits(), cooldown.getLeastSignificantBits()));
+//                }
+//            }
+
+
+            //New method:
+            NBTTagList moveSkillCooldowns = nbt.getTagList("MoveSkillCooldown", 10);
+            if (this.moveSkillCooldownData == null) {
+                this.moveSkillCooldownData = Maps.newHashMap();
+            }
+
+            for (NBTBase skillCooldown : moveSkillCooldowns) {
+                NBTTagCompound moveSkillData = (NBTTagCompound) skillCooldown;
+                MoveSkill moveSkill = MoveSkill.getMoveSkillByID(moveSkillData.getString("MoveSkillCooldownId"));
+                long current = moveSkillData.getLong("MoveSkillCooldownCurrent");
+                long target = moveSkillData.getLong("MoveSkillCooldownTarget");
                 if (moveSkill != null) {
-                    UUID cooldown = moveSkillCooldowns.getUniqueId(moveSkill.id);
-                    this.moveSkillCooldownData.put(moveSkill.id, new Tuple<>(cooldown.getMostSignificantBits(), cooldown.getLeastSignificantBits()));
+                    this.moveSkillCooldownData.put(moveSkill.id, new Tuple<>(current, target));
                 }
             }
         }
@@ -284,15 +304,31 @@ public class PokemonBean extends Pokemon {
                 }
             }
         }
-        if (nbt.hasKey(NbtKeys.DISPLAY_RIBBON)) {
-            String disp = nbt.getString(NbtKeys.DISPLAY_RIBBON);
-            //TODO: Support "NONE"
-            this.displayedRibbon = disp == "" ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp);
+        //Old ribbon adding mtd
+//        if (nbt.hasKey(NbtKeys.DISPLAY_RIBBON)) {
+//            String disp = nbt.getString(NbtKeys.DISPLAY_RIBBON);
+//            this.displayedRibbon = disp == "" ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp);
+//        }
+//        if (nbt.hasKey(NbtKeys.RIBBONS)) {
+//            this.ribbons.clear();
+//            for (NBTBase nbtBase : nbt.getTagList(NbtKeys.RIBBONS, 8)) {
+//                this.ribbons.add(EnumRibbonType.valueOf(((NBTTagString) nbtBase).getString()));
+//            }
+//        }
+
+        //New ribbon io method
+        String ribbon_display2 = NbtKeys.DISPLAY_RIBBON + "2";
+        if (nbt.hasKey(ribbon_display2)) {
+            String disp = nbt.getCompoundTag(ribbon_display2).getString("type").toUpperCase();
+            this.displayedRibbon = (disp.isEmpty() || "NONE".equalsIgnoreCase(disp) || !Enums.getIfPresent(EnumRibbonType.class, disp).isPresent() ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp));
         }
-        if (nbt.hasKey(NbtKeys.RIBBONS)) {
+
+        String ribbons2 = NbtKeys.RIBBONS + "2";
+        if (nbt.hasKey(ribbons2)) {
             this.ribbons.clear();
-            for (NBTBase nbtBase : nbt.getTagList(NbtKeys.RIBBONS, 8)) {
-                this.ribbons.add(EnumRibbonType.valueOf(((NBTTagString) nbtBase).getString()));
+            for (NBTBase nbtBase : nbt.getTagList(ribbons2, 10)) {
+                String disp = ((NBTTagCompound) nbtBase).getString("type").toUpperCase();
+                this.ribbons.add(disp.isEmpty() || "NONE".equalsIgnoreCase(disp) || !Enums.getIfPresent(EnumRibbonType.class, disp).isPresent() ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp));
             }
         }
     }
@@ -349,8 +385,9 @@ public class PokemonBean extends Pokemon {
         nbt.setBoolean(NbtKeys.IS_IN_RANCH, this.inRanch);
         nbt.setShort(NbtKeys.FRIENDSHIP, (short) this.friendship);
 
-        //TODO: Need to change to name instead of id
-        this.moveset.writeToNBT(nbt);
+        ////Old one:
+//        this.moveset.writeToNBT(nbt);
+        this.writeMoveset(nbt);
         this.stats.writeToNBT(nbt);
         this.bonusStats.writeToNBT(nbt);
 
@@ -389,29 +426,63 @@ public class PokemonBean extends Pokemon {
             }
             nbt.setIntArray(NbtKeys.RELEARNABLE_MOVES, relearnableMoves);
         }
-        NBTTagCompound moveSkillCooldowns = new NBTTagCompound();
-        long cur = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0].getTotalWorldTime();
+
+
+        //Old method:
+//        NBTTagCompound moveSkillCooldowns = new NBTTagCompound();
+//        long cur = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0].getTotalWorldTime();
+//        for (Map.Entry<String, Tuple<Long, Long>> entry : this.moveSkillCooldownData.entrySet()) {
+//            if (entry.getValue().getSecond() >= cur) {
+//                moveSkillCooldowns.setUniqueId(entry.getKey(), new UUID(entry.getValue().getFirst(), entry.getValue().getSecond()));
+//            }
+//        }
+//        if (moveSkillCooldowns.getSize() != 0) {
+//            nbt.setTag(NbtKeys.MOVE_SKILL_COOLDOWNS, moveSkillCooldowns);
+//        }
+
+        //New method
+        NBTTagList moveSkillCooldowns = new NBTTagList();
         for (Map.Entry<String, Tuple<Long, Long>> entry : this.moveSkillCooldownData.entrySet()) {
-            if (entry.getValue().getSecond() >= cur) {
-                moveSkillCooldowns.setUniqueId(entry.getKey(), new UUID(entry.getValue().getFirst(), entry.getValue().getSecond()));
-            }
+            NBTTagCompound entryNBT = new NBTTagCompound();
+            entryNBT.setString("MoveSkillCooldownId", entry.getKey());
+            entryNBT.setLong("MoveSkillCooldownCurrent", entry.getValue().getFirst());
+            entryNBT.setLong("MoveSkillCooldownTarget", entry.getValue().getSecond());
+            moveSkillCooldowns.appendTag(entryNBT);
         }
-        if (moveSkillCooldowns.getSize() != 0) {
-            nbt.setTag(NbtKeys.MOVE_SKILL_COOLDOWNS, moveSkillCooldowns);
+
+        if (moveSkillCooldowns.tagCount() != 0) {
+            nbt.setTag("MoveSkillCooldown", moveSkillCooldowns);
         }
+
+
         NBTTagList specList = new NBTTagList();
         for (String specFlag : this.specFlags) {
             specList.appendTag(new NBTTagString(specFlag));
         }
         nbt.setTag(NbtKeys.SPEC_FLAGS, specList);
+
+        //Old ribbon io method
+//        if (this.displayedRibbon != null) {
+//            nbt.setString(NbtKeys.DISPLAY_RIBBON, this.displayedRibbon.toString());
+//        }
+//        NBTTagList ribbonList = new NBTTagList();
+//        for (EnumRibbonType ribbon : this.ribbons) {
+//            ribbonList.appendTag(new NBTTagString(ribbon.toString()));
+//        }
+//        nbt.setTag(NbtKeys.RIBBONS, ribbonList);
+
+
+        //New ribbon io method
         if (this.displayedRibbon != null) {
-            nbt.setString(NbtKeys.DISPLAY_RIBBON, this.displayedRibbon.toString());
+            nbt.setTag("ribbon_display2", serializeRibbon(this.displayedRibbon));
         }
+
         NBTTagList ribbonList = new NBTTagList();
-        for (EnumRibbonType ribbon : this.ribbons) {
-            ribbonList.appendTag(new NBTTagString(ribbon.toString()));
+        for (EnumRibbonType enumRibbonType : this.ribbons) {
+            ribbonList.appendTag(serializeRibbon(enumRibbonType));
         }
-        nbt.setTag(NbtKeys.RIBBONS, ribbonList);
+
+        nbt.setTag("ribbons2", ribbonList);
         return nbt;
     }
 
@@ -702,5 +773,75 @@ public class PokemonBean extends Pokemon {
                 }
             }
         }
+    }
+
+    private void readMoveset(NBTTagCompound nbt) {
+        // Must read first to use the original moveset reminderMoves reading function,
+        // since reminderMoves is private, so it can't be accessed directly.
+//        this.moveset.readFromNBT(nbt);
+        this.moveset.clear();
+        NBTTagList list = nbt.getTagList("Moveset", 10);
+
+        for (NBTBase nbtBase : list) {
+            NBTTagCompound compound = (NBTTagCompound) nbtBase;
+            //Only difference is the string moveID
+            String moveID = compound.getString("MoveID");
+            int movePP = compound.getShort("MovePP");
+            int movePPLevel = compound.getShort("MovePPLevel");
+            Attack attack = new Attack(moveID);
+            if (!moveID.isEmpty() && attack.getActualMove() != null) {
+                attack.pp = movePP;
+                attack.ppLevel = movePPLevel;
+                this.moveset.add(attack);
+            }
+        }
+
+        this.moveset.getReminderMoves().clear();
+        if (nbt.hasKey("RelrnMoves")) {
+            list = nbt.getTagList("Moveset", 8);
+            for (NBTBase nbtBase : list) {
+                NBTTagInt id = (NBTTagInt) nbtBase;
+                Optional<AttackBase> attackBase = AttackBase.getAttackBase(id.toString());
+                attackBase.ifPresent(atk -> this.moveset.getReminderMoves().add(atk));
+            }
+        }
+
+    }
+
+    private void writeMoveset(NBTTagCompound nbt) {
+        NBTTagList list = new NBTTagList();
+
+        for (Attack attack : this.moveset) {
+            if (attack != null && attack.getActualMove() != null && attack.getActualMove().getAttackId() != -1) {
+                NBTTagCompound compound = new NBTTagCompound();
+                //Only difference is the string moveID
+                compound.setString("MoveID", attack.getActualMove().getAttackName());
+                compound.setByte("MovePP", (byte) attack.pp);
+                if (attack.ppLevel != 0) {
+                    compound.setByte("MovePPLevel", (byte) attack.ppLevel);
+                }
+                list.appendTag(compound);
+            }
+        }
+
+        nbt.setTag("Moveset", list);
+
+        NBTTagList relearn = new NBTTagList();
+        this.moveset.getReminderMoves().forEach((ab) -> {
+            relearn.appendTag(new NBTTagString(ab.getAttackName()));
+        });
+        nbt.setTag("RelrnMoves", relearn);
+    }
+
+    private NBTTagCompound serializeRibbon(EnumRibbonType ribbon) {
+        NBTTagCompound displayRibbonNbt = new NBTTagCompound();
+        displayRibbonNbt.setString("type", ribbon.name().toLowerCase());
+        displayRibbonNbt.setLong("received", System.currentTimeMillis());
+        displayRibbonNbt.setString("receiver", ITextComponent.Serializer.componentToJson(
+                new TextComponentString(
+                        Optional.ofNullable(this.getOwnerPlayer()).isPresent() ? this.getOwnerPlayer().getName() : ""
+                )
+        ));
+        return displayRibbonNbt;
     }
 }
