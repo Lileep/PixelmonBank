@@ -1,5 +1,6 @@
 package com.github.lileep.pixelmonbank.data.serializer;
 
+import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.data.bean.PokemonBean;
@@ -40,7 +41,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(dataPack).isPresent()) {
             jsonData = dataPack.getData(getUniqueName());
         } else {
-            System.out.println("dataPack is null.");
+            PixelmonBank.LOGGER.error("dataPack is null.");
             return null;
         }
 
@@ -48,7 +49,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(jsonData).isPresent()) {
             map = GSON.fromJson(jsonData, TYPE);
         } else {
-            System.out.println("Analyzing json failed.");
+            PixelmonBank.LOGGER.error("Analyzing json failed.");
             return null;
         }
 
@@ -64,7 +65,7 @@ public class PixelmonSerializer implements ISerializer {
 //                pokemonList.add(Pixelmon.pokemonFactory.create(nbtTagCompound));
                 pokemonList.add(Pixelmon.pokemonFactory.create(pokemonBean.writeToNBT(nbtTagCompound)));
             } catch (NBTException e) {
-                System.out.println("Failed to write nbt.");
+                PixelmonBank.LOGGER.error("Failed to write nbt.");
                 return null;
             }
         }
