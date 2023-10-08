@@ -40,7 +40,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(dataPack).isPresent()) {
             jsonData = dataPack.getData(getUniqueName());
         } else {
-            PixelmonBank.LOGGER.warn("dataPack is null.");
+            PixelmonBank.LOGGER.error("dataPack is null.");
             return null;
         }
 
@@ -48,7 +48,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(jsonData).isPresent()) {
             map = GSON.fromJson(jsonData, TYPE);
         } else {
-            PixelmonBank.LOGGER.warn("Analyzing json failed.");
+            PixelmonBank.LOGGER.error("Analyzing json failed.");
             return null;
         }
 
@@ -64,7 +64,7 @@ public class PixelmonSerializer implements ISerializer {
 //                pokemonList.add(pokemonBean);
                 pokemonList.add(PokemonFactory.create(compoundNBT));
             } catch (CommandSyntaxException e) {
-                PixelmonBank.LOGGER.warn("Failed to write nbt.");
+                PixelmonBank.LOGGER.error("Failed to write nbt.");
                 return null;
             }
         }
