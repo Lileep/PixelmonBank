@@ -6,6 +6,7 @@ import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.lib.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
 import net.minecraft.nbt.CompoundNBT;
@@ -62,7 +63,7 @@ public class PixelmonSerializer implements ISerializer {
 //                pokemonBean.readFromNBT(compoundNBT);
 //                pokemonList.add(pokemonBean);
                 pokemonList.add(PokemonFactory.create(compoundNBT));
-            } catch (Exception e) {
+            } catch (CommandSyntaxException e) {
                 PixelmonBank.LOGGER.warn("Failed to write nbt.");
                 return null;
             }
