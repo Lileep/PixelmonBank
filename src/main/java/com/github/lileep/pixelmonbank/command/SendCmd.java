@@ -101,8 +101,8 @@ public class SendCmd {
                 return;
             }
 
-            //Check whether the last pokemon in team is an egg
-            if (sStorage.getTeam().size() == 1 && !pokemon.isEgg()) {
+            //Check whether it's the last pokemon in team
+            if (sStorage.getTeam().size() == 1) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getPartyLastOne()), sender.getGameProfile().getId());
                 return;
             }
@@ -122,7 +122,7 @@ public class SendCmd {
         if (SyncHandler.getInstance().sendOne(uuid, pokemon)) {
             //Delete player's pixelmon
             sStorage.set(slot - 1, null);
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessSendMsg(), pokemon.getFormattedDisplayName()), sender.getGameProfile().getId());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessSendMsg(), pokemon.getFormattedDisplayName().getString()), sender.getGameProfile().getId());
         }
     }
 

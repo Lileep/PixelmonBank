@@ -71,7 +71,7 @@ public class GetCmd {
         if (SyncHandler.getInstance().delOne(id, uuid)) {
             PokemonOptUtil.operatePokemon(pokemon);
             sStorage.add(pokemon);
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName()), sender.getGameProfile().getId());
+            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName().getString()), sender.getGameProfile().getId());
         }
 
         //Judge online and send success msg
