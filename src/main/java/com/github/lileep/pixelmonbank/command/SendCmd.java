@@ -101,8 +101,8 @@ public class SendCmd {
                 return;
             }
 
-            //Check whether it's the last pokemon in team
-            if (sStorage.getTeam().size() == 1) {
+            //Check whether the last pokemon in team is an egg
+            if (sStorage.getTeam().size() == 1 && !pokemon.isEgg()) {
                 sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getPartyLastOne()), sender.getGameProfile().getId());
                 return;
             }
