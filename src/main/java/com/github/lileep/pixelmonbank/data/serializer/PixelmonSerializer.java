@@ -29,7 +29,6 @@ public class PixelmonSerializer implements ISerializer {
         Map<String, String> data = new HashMap<>(1);
 //        Pokemon pokemonBean = new PokemonBean(pokemon.getUUID());
 //        pokemonBean.readFromNBT(pokemon.writeToNBT(new CompoundNBT()));
-        //TODO: Deal with nbt compound without considering pokemon uuid. Abstract it.
         data.put(pokemon.getUUID().toString(), pokemon.writeToNBT(new CompoundNBT()).toString());
         return GSON.toJson(data, TYPE);
     }
@@ -59,7 +58,7 @@ public class PixelmonSerializer implements ISerializer {
             try {
                 compoundNBT = JsonToNBT.parseTag(map.get(key));
 
-//                PokemonBean pokemonBean = new PokemonBean((compoundNBT.getUUID("UUID")));
+//                PokemonBean pokemonBean = new PokemonBean(UUID.fromString(key));
 //                pokemonBean.readFromNBT(compoundNBT);
 //                pokemonList.add(pokemonBean);
                 pokemonList.add(PokemonFactory.create(compoundNBT));
