@@ -20,6 +20,7 @@ public class ReloadCmd {
 
     @CommandProcessor
     public void run(@Sender ICommandSource sender) {
+        sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getConfigReloading()), Util.NIL_UUID);
         PixelmonBank.getInstance().loadConfig();
         sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getConfigLoadSuccess()), Util.NIL_UUID);
     }

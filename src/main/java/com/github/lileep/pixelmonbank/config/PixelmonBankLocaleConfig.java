@@ -18,27 +18,6 @@ public class PixelmonBankLocaleConfig extends AbstractYamlConfig {
     private String configLoadSuccess = "&aSuccessfully load config.";
     private String configReloading = "&7Reloading config...";
 
-    private String cfgCategoryGeneral = "General settings for Pixelmon Bank";
-    private String cfgAllowLegendary = "Whether allow legendaries to be sent to Pixelmon Bank";
-    private String cfgAllowUltraBeast = "Whether allow ultra beasts to be sent to Pixelmon Bank";
-    private String cfgAllowEgg = "Whether allow eggs to be sent to Pixelmon Bank";
-    private String cfgAllowUntradeable = "Whether allow untradeable pixelmons to be sent to Pixelmon Bank";
-    private String cfgBlackList = "Listed pixelmons will be prohibited from being sent to Pixelmon Bank(Comma separate)";
-    private String cfgBlackListItem = "Pixelmons hold listed items will be prohibited from being sent to Pixelmon Bank";
-    private String cfgBlackListMove = "Pixelmons have listed moves will be prohibited from being sent to Pixelmon Bank";
-    private String cfgMaxIvs = "Pixelmons whose max iv(31) amount above this value will be prohibited from being sent to Pixelmon Bank";
-    private String cfgCountHyperTrained = "Take hyper trained(used bottle caps) ivs into account for max ivs checking";
-
-    private String cfgCategoryDB = "Database settings for Pixelmon Bank. Restart server to apply instead of reload";
-    private String cfgServerName = "Name of your server. Pixelmon Bank will make this a database field";
-    private String cfgDBIP = "IP address of database";
-    private String cfgDBPort = "Port of database";
-    private String cfgDBName = "Name of database. Please manually create this database before using Pixelmon Bank";
-    private String cfgDBUsername = "User name of database";
-    private String cfgDBPasswd = "Password of database";
-
-    private String cfgCategoryLocale = "Language file for Pixelmon Bank";
-
     private String playerOnly = "&cOnly players can use this command.";
     private String slotNumInvalid = "&cInvalid slot number given.";
     private String slotNumLimited = "&cSlot number must be between 1 and 6.";
@@ -109,77 +88,6 @@ public class PixelmonBankLocaleConfig extends AbstractYamlConfig {
         return configReloading;
     }
 
-    public String getCfgCategoryGeneral() {
-        return cfgCategoryGeneral;
-    }
-
-    public String getCfgAllowLegendary() {
-        return cfgAllowLegendary;
-    }
-
-    public String getCfgAllowUltraBeast() {
-        return cfgAllowUltraBeast;
-    }
-
-    public String getCfgAllowEgg() {
-        return cfgAllowEgg;
-    }
-
-    public String getCfgAllowUntradeable() {
-        return cfgAllowUntradeable;
-    }
-
-    public String getCfgBlackList() {
-        return cfgBlackList;
-    }
-
-    public String getCfgBlackListItem() {
-        return cfgBlackListItem;
-    }
-
-    public String getCfgBlackListMove() {
-        return cfgBlackListMove;
-    }
-
-    public String getCfgMaxIvs() {
-        return cfgMaxIvs;
-    }
-
-    public String getCfgCountHyperTrained() {
-        return cfgCountHyperTrained;
-    }
-
-    public String getCfgCategoryDB() {
-        return cfgCategoryDB;
-    }
-
-    public String getCfgServerName() {
-        return cfgServerName;
-    }
-
-    public String getCfgDBIP() {
-        return cfgDBIP;
-    }
-
-    public String getCfgDBPort() {
-        return cfgDBPort;
-    }
-
-    public String getCfgDBName() {
-        return cfgDBName;
-    }
-
-    public String getCfgDBUsername() {
-        return cfgDBUsername;
-    }
-
-    public String getCfgDBPasswd() {
-        return cfgDBPasswd;
-    }
-
-    public String getCfgCategoryLocale() {
-        return cfgCategoryLocale;
-    }
 
     public String getPlayerOnly() {
         return playerOnly;
