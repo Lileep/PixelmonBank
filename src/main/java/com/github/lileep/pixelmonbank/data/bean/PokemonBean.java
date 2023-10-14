@@ -1,5 +1,6 @@
 package com.github.lileep.pixelmonbank.data.bean;
 
+import com.github.lileep.pixelmonbank.util.UUIDCodec;
 import com.google.common.base.Enums;
 import com.google.common.collect.Maps;
 import com.pixelmonmod.pixelmon.Pixelmon;
@@ -15,6 +16,7 @@ import com.pixelmonmod.pixelmon.battles.status.StatusPersist;
 import com.pixelmonmod.pixelmon.config.PixelmonConfig;
 import com.pixelmonmod.pixelmon.config.RemapHandler;
 import com.pixelmonmod.pixelmon.entities.pixelmon.abilities.AbilityBase;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Gender;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Pokerus;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats.DeoxysStats;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats.MeltanStats;
@@ -63,7 +65,10 @@ public class PokemonBean extends Pokemon {
         }
 
         int NBT_VERSION = nbt.getByte("NBT_VERSION");
-        this.setUUID(nbt.getUniqueId(NbtKeys.UUID));
+        //Old method
+//        this.setUUID(nbt.getUniqueId(NbtKeys.UUID));
+        //New method
+        this.setUUID(UUIDCodec.uuidFromIntArray(nbt.getIntArray(NbtKeys.UUID)));
 
         //Shiny is done in readFromNBTSpecialMons
 
@@ -110,7 +115,10 @@ public class PokemonBean extends Pokemon {
 
         this.setCustomTexture(nbt.getString(NbtKeys.CUSTOM_TEXTURE));
         this.setNickname(nbt.getString(NbtKeys.NICKNAME));
-        this.setCaughtBall(nbt.hasKey(NbtKeys.CAUGHT_BALL) ? EnumPokeballs.getFromIndex(nbt.getByte(NbtKeys.CAUGHT_BALL)) : EnumPokeballs.PokeBall);
+        //Old caught ball read method
+//        this.setCaughtBall(nbt.hasKey(NbtKeys.CAUGHT_BALL) ? EnumPokeballs.getFromIndex(nbt.getByte(NbtKeys.CAUGHT_BALL)) : EnumPokeballs.PokeBall);
+        //New caught ball read method
+        this.setCaughtBall(nbt.hasKey(NbtKeys.CAUGHT_BALL) ? EnumPokeballs.getPokeballFromString(nbt.getString(NbtKeys.CAUGHT_BALL)) : EnumPokeballs.PokeBall);
         this.setNature(EnumNature.getNatureFromIndex(nbt.getByte(NbtKeys.NATURE)));
         byte mintNature = nbt.hasKey(NbtKeys.MINT_NATURE) ? nbt.getByte(NbtKeys.MINT_NATURE) : -1;
         this.mintNature = mintNature == -1 ? null : EnumNature.getNatureFromIndex(mintNature);
@@ -119,11 +127,18 @@ public class PokemonBean extends Pokemon {
         }
 
         this.setGrowth(EnumGrowth.getGrowthFromIndex(nbt.getByte(NbtKeys.GROWTH)));
-        this.eggCycles = nbt.hasKey(NbtKeys.EGG_CYCLES) ? nbt.getInteger(NbtKeys.EGG_CYCLES) : null;
+        //New version use eggCycles==-1 instead null to judge whether it is an egg
+        this.eggCycles = nbt.hasKey(NbtKeys.EGG_CYCLES) && nbt.getInteger(NbtKeys.EGG_CYCLES) != -1 ? nbt.getInteger(NbtKeys.EGG_CYCLES) : null;
         this.eggSteps = this.eggCycles != null && nbt.hasKey(NbtKeys.STEPS) ? nbt.getInteger(NbtKeys.STEPS) : null;
         this.originalTrainerName = nbt.getString(NbtKeys.ORIGINAL_TRAINER);
-        if (nbt.hasUniqueId((NbtKeys.ORIGINAL_TRAINER_UUID))) {
-            this.originalTrainerUUID = nbt.getUniqueId(NbtKeys.ORIGINAL_TRAINER_UUID);
+
+        //Old method:
+//        if (nbt.hasUniqueId((NbtKeys.ORIGINAL_TRAINER_UUID))) {
+//            this.originalTrainerUUID = nbt.getUniqueId(NbtKeys.ORIGINAL_TRAINER_UUID);
+//        }
+        //New method
+        if (nbt.hasKey(NbtKeys.ORIGINAL_TRAINER_UUID)) {
+            this.originalTrainerUUID = UUIDCodec.uuidFromIntArray(nbt.getIntArray(NbtKeys.ORIGINAL_TRAINER_UUID));
         }
 
         //restoreOT()
@@ -155,13 +170,14 @@ public class PokemonBean extends Pokemon {
         this.setDoesLevel(nbt.getBoolean(NbtKeys.DOES_LEVEL));
         this.setFriendship(nbt.getShort(NbtKeys.FRIENDSHIP));
 
-        //Old one:
-//        this.moveset.readFromNBT(nbt);
-        this.readMoveset(nbt);
 
         //Special processing of defense → defence
         this.defenseTo1122(nbt);
 
+        //Old moveset read method:
+//        this.moveset.readFromNBT(nbt);
+        //New moveset read method:
+        this.readMoveset(nbt);
         this.stats.readFromNBT(nbt);
         this.bonusStats.readFromNBT(nbt);
         this.health = nbt.getInteger(NbtKeys.HEALTH);
@@ -255,23 +271,9 @@ public class PokemonBean extends Pokemon {
         if (nbt.hasKey(NbtKeys.IS_EGG) && !nbt.getBoolean(NbtKeys.IS_EGG)) {
             this.eggCycles = null;
         }
-        if (nbt.hasKey(NbtKeys.MOVE_SKILL_COOLDOWNS)) {
 
-            //Old method:
-//            NBTTagCompound moveSkillCooldowns = nbt.getCompoundTag(NbtKeys.MOVE_SKILL_COOLDOWNS);
-//            for (String moveSkillID : moveSkillCooldowns.getKeySet()) {
-//                if (moveSkillID.endsWith("Most")) {
-//                    moveSkillID = moveSkillID.substring(0, moveSkillID.length() - 4);
-//                }
-//                MoveSkill moveSkill = MoveSkill.getMoveSkillByID(moveSkillID);
-//                if (moveSkill != null) {
-//                    UUID cooldown = moveSkillCooldowns.getUniqueId(moveSkill.id);
-//                    this.moveSkillCooldownData.put(moveSkill.id, new Tuple<>(cooldown.getMostSignificantBits(), cooldown.getLeastSignificantBits()));
-//                }
-//            }
-
-
-            //New method:
+        //New move skill read method
+        if (nbt.hasKey("MoveSkillCooldown")) {
             NBTTagList moveSkillCooldowns = nbt.getTagList("MoveSkillCooldown", 10);
             if (this.moveSkillCooldownData == null) {
                 this.moveSkillCooldownData = Maps.newHashMap();
@@ -304,19 +306,8 @@ public class PokemonBean extends Pokemon {
                 }
             }
         }
-        //Old ribbon adding mtd
-//        if (nbt.hasKey(NbtKeys.DISPLAY_RIBBON)) {
-//            String disp = nbt.getString(NbtKeys.DISPLAY_RIBBON);
-//            this.displayedRibbon = disp == "" ? EnumRibbonType.NONE : EnumRibbonType.valueOf(disp);
-//        }
-//        if (nbt.hasKey(NbtKeys.RIBBONS)) {
-//            this.ribbons.clear();
-//            for (NBTBase nbtBase : nbt.getTagList(NbtKeys.RIBBONS, 8)) {
-//                this.ribbons.add(EnumRibbonType.valueOf(((NBTTagString) nbtBase).getString()));
-//            }
-//        }
 
-        //New ribbon io method
+        //New ribbon read method
         String ribbon_display2 = NbtKeys.DISPLAY_RIBBON + "2";
         if (nbt.hasKey(ribbon_display2)) {
             String disp = nbt.getCompoundTag(ribbon_display2).getString("type").toUpperCase();
@@ -341,7 +332,10 @@ public class PokemonBean extends Pokemon {
         nbt.setString(NbtKeys.FORM, "");
         nbt.setByte(NbtKeys.GENDER, (byte) this.getGender().ordinal());
         nbt.setByte("NBT_VERSION", (byte) 1);
-        nbt.setUniqueId(NbtKeys.UUID, this.uuid);
+        //Old method
+//        nbt.setUniqueId(NbtKeys.UUID, this.uuid);
+        //New method
+        nbt.setIntArray(NbtKeys.UUID, UUIDCodec.uuidToIntArray(this.uuid));
 
         nbt.setString("palette", this.isShiny ? "shiny" : "none");
         writeToNBTSpecialMons(nbt);
@@ -352,7 +346,10 @@ public class PokemonBean extends Pokemon {
             nbt.removeTag(NbtKeys.NICKNAME);
         }
         if (this.caughtBall != null) {
-            nbt.setByte(NbtKeys.CAUGHT_BALL, (byte) this.caughtBall.ordinal());
+            //Old caught ball write method
+//            nbt.setByte(NbtKeys.CAUGHT_BALL, (byte) this.caughtBall.ordinal());
+            //New caught ball write method
+            nbt.setString(NbtKeys.CAUGHT_BALL, this.caughtBall.getFilenamePrefix());
         } else {
             nbt.removeTag(NbtKeys.CAUGHT_BALL);
         }
@@ -363,26 +360,33 @@ public class PokemonBean extends Pokemon {
         nbt.setByte(NbtKeys.GROWTH, (byte) this.growth.index);
         if (this.eggCycles != null) {
             nbt.setInteger(NbtKeys.EGG_CYCLES, this.eggCycles);
-            nbt.setInteger(NbtKeys.STEPS, getEggSteps());
+            nbt.setInteger(NbtKeys.STEPS, this.getEggSteps());
         } else {
-            nbt.removeTag(NbtKeys.EGG_CYCLES);
+            //New version use eggCycles==-1 instead null to judge whether it is an egg
+            nbt.setInteger(NbtKeys.EGG_CYCLES, -1);
         }
         if (this.originalTrainerName != null && !this.originalTrainerName.isEmpty()) {
             nbt.setString(NbtKeys.ORIGINAL_TRAINER, this.originalTrainerName);
         } else {
             nbt.removeTag(NbtKeys.ORIGINAL_TRAINER);
         }
+
         if (this.originalTrainerUUID != null) {
-            nbt.setUniqueId(NbtKeys.ORIGINAL_TRAINER_UUID, this.originalTrainerUUID);
+            //Old method
+//            nbt.setUniqueId(NbtKeys.ORIGINAL_TRAINER_UUID, this.originalTrainerUUID);
+            //New method
+            nbt.setIntArray(NbtKeys.ORIGINAL_TRAINER_UUID, UUIDCodec.uuidToIntArray(this.originalTrainerUUID));
         } else {
             nbt.removeTag(NbtKeys.ORIGINAL_TRAINER_UUID);
         }
+
         nbt.setInteger(NbtKeys.LEVEL, this.level);
         nbt.setInteger(NbtKeys.DYNAMAX_LEVEL, this.dynamaxLevel);
         nbt.setBoolean(NbtKeys.GIGANTAMAX_FACTOR, this.gigantamaxFactor);
         nbt.setInteger(NbtKeys.EXP, this.experience);
         nbt.setBoolean(NbtKeys.DOES_LEVEL, this.doesLevel);
-        nbt.setBoolean(NbtKeys.IS_IN_RANCH, this.inRanch);
+        //Don't need this
+//        nbt.setBoolean(NbtKeys.IS_IN_RANCH, this.inRanch);
         nbt.setShort(NbtKeys.FRIENDSHIP, (short) this.friendship);
 
         ////Old one:
@@ -403,11 +407,13 @@ public class PokemonBean extends Pokemon {
             }
         }
 
-        if (this.abilitySlot != -1) {
-            nbt.setByte(NbtKeys.ABILITY_SLOT, (byte) this.abilitySlot);
-        } else if (this.ability != null) {
-            String abilityName = getAbilityName();
-            nbt.setString("Ability", abilityName);
+        //Old ability write method
+//        if (this.abilitySlot != -1) {
+//            nbt.setByte(NbtKeys.ABILITY_SLOT, (byte) this.abilitySlot);
+//        }
+        //New ability write method
+        if (this.ability != null) {
+            nbt.setString(NbtKeys.ABILITY, this.getAbilityName());
         }
         if (this.pokerus != null) {
             nbt.setTag(NbtKeys.POKERUS, this.pokerus.serializeToNBT());
@@ -427,20 +433,7 @@ public class PokemonBean extends Pokemon {
             nbt.setIntArray(NbtKeys.RELEARNABLE_MOVES, relearnableMoves);
         }
 
-
-        //Old method:
-//        NBTTagCompound moveSkillCooldowns = new NBTTagCompound();
-//        long cur = FMLCommonHandler.instance().getMinecraftServerInstance().worlds[0].getTotalWorldTime();
-//        for (Map.Entry<String, Tuple<Long, Long>> entry : this.moveSkillCooldownData.entrySet()) {
-//            if (entry.getValue().getSecond() >= cur) {
-//                moveSkillCooldowns.setUniqueId(entry.getKey(), new UUID(entry.getValue().getFirst(), entry.getValue().getSecond()));
-//            }
-//        }
-//        if (moveSkillCooldowns.getSize() != 0) {
-//            nbt.setTag(NbtKeys.MOVE_SKILL_COOLDOWNS, moveSkillCooldowns);
-//        }
-
-        //New method
+        //New move skill write method
         NBTTagList moveSkillCooldowns = new NBTTagList();
         for (Map.Entry<String, Tuple<Long, Long>> entry : this.moveSkillCooldownData.entrySet()) {
             NBTTagCompound entryNBT = new NBTTagCompound();
@@ -461,19 +454,8 @@ public class PokemonBean extends Pokemon {
         }
         nbt.setTag(NbtKeys.SPEC_FLAGS, specList);
 
-        //Old ribbon io method
-//        if (this.displayedRibbon != null) {
-//            nbt.setString(NbtKeys.DISPLAY_RIBBON, this.displayedRibbon.toString());
-//        }
-//        NBTTagList ribbonList = new NBTTagList();
-//        for (EnumRibbonType ribbon : this.ribbons) {
-//            ribbonList.appendTag(new NBTTagString(ribbon.toString()));
-//        }
-//        nbt.setTag(NbtKeys.RIBBONS, ribbonList);
-
-
-        //New ribbon io method
-        if (this.displayedRibbon != null) {
+        //New ribbon write method
+        if (this.displayedRibbon != null && this.displayedRibbon != EnumRibbonType.NONE) {
             nbt.setTag("ribbon_display2", serializeRibbon(this.displayedRibbon));
         }
 
@@ -613,8 +595,10 @@ public class PokemonBean extends Pokemon {
             if (this.getExtraStats() != null) {
                 ((DeoxysStats) this.extraStats).setSus(formByte == EnumDeoxys.Sus.getForm());
             }
-        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Mareep, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Unfezant, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Greninja, EnumSpecies.Floette, EnumSpecies.Furfrou, EnumSpecies.Aegislash, EnumSpecies.Xerneas, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Minior, EnumSpecies.Mimikyu, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Wooloo, EnumSpecies.Dubwool, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
-            //No Deoxys here
+        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Furfrou, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
+            // Special forms
+            // Deoxys, Unfezant, Aegislash, Floetta, Minior, Xerneas, Wooloo and Dubwool are already judged
+            // Greninja and Mimikyu need to be judged in the last else block
             for (IEnumForm formElem : this.species.getPossibleForms(true)) {
                 if (form.equalsIgnoreCase(formElem.getName())) {
                     formByte = formElem.getForm();
@@ -647,6 +631,9 @@ public class PokemonBean extends Pokemon {
                     break;
                 }
             }
+        } else if (this.species.is(EnumSpecies.Unfezant, EnumSpecies.Frillish, EnumSpecies.Jellicent, EnumSpecies.Pyroar, EnumSpecies.Meowstic, EnumSpecies.Basculegion)) {
+            // Gender differences
+            formByte = nbt.hasKey(NbtKeys.GENDER) ? nbt.getByte(NbtKeys.GENDER) : 0;
         } else {
             if (this.species.is(EnumSpecies.Meltan)) {
                 //Deal with extra stats
@@ -706,8 +693,10 @@ public class PokemonBean extends Pokemon {
                 nbt.setString("palette", EnumMinior.values()[colorIndex + 1].getName().toLowerCase());
             }
             nbt.setString(NbtKeys.FORM, pokemonForm == EnumMinior.METEOR ? "meteor" : "core");
-        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Mareep, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Deoxys, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Unfezant, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Greninja, EnumSpecies.Floette, EnumSpecies.Furfrou, EnumSpecies.Aegislash, EnumSpecies.Xerneas, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Minior, EnumSpecies.Mimikyu, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Wooloo, EnumSpecies.Dubwool, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
-            //Rapidash, Porygon, Kecleon, Weavile, Zoroark, Solgaleo don't need to be judged
+        } else if (this.species.is(EnumSpecies.Pikachu, EnumSpecies.Ponyta, EnumSpecies.Tauros, EnumSpecies.Dragonite, EnumSpecies.Pichu, EnumSpecies.Natu, EnumSpecies.Heracross, EnumSpecies.Lunatone, EnumSpecies.Castform, EnumSpecies.Deoxys, EnumSpecies.Bidoof, EnumSpecies.Burmy, EnumSpecies.Wormadam, EnumSpecies.Cherrim, EnumSpecies.Gastrodon, EnumSpecies.Rotom, EnumSpecies.Dialga, EnumSpecies.Palkia, EnumSpecies.Giratina, EnumSpecies.Shaymin, EnumSpecies.Arceus, EnumSpecies.Basculin, EnumSpecies.Darmanitan, EnumSpecies.Deerling, EnumSpecies.Sawsbuck, EnumSpecies.Tornadus, EnumSpecies.Thundurus, EnumSpecies.Landorus, EnumSpecies.Kyurem, EnumSpecies.Keldeo, EnumSpecies.Meloetta, EnumSpecies.Genesect, EnumSpecies.Furfrou, EnumSpecies.Zygarde, EnumSpecies.Hoopa, EnumSpecies.Oricorio, EnumSpecies.Lycanroc, EnumSpecies.Wishiwashi, EnumSpecies.Silvally, EnumSpecies.Lunala, EnumSpecies.Necrozma, EnumSpecies.Magearna, EnumSpecies.Marshadow, EnumSpecies.Cramorant, EnumSpecies.Toxtricity, EnumSpecies.Sinistea, EnumSpecies.Polteageist, EnumSpecies.Eiscue, EnumSpecies.Morpeko, EnumSpecies.Zacian, EnumSpecies.Zamazenta, EnumSpecies.Eternatus, EnumSpecies.Urshifu, EnumSpecies.Zarude, EnumSpecies.Calyrex, EnumSpecies.Enamorus)) {
+            // Rapidash, Porygon, Kecleon, Weavile, Zoroark, Solgaleo don't need to be judged
+            // Unfezant, Aegislash, Floetta, Minior, Xerneas, Wooloo and Dubwool are already judged
+            // Greninja and Mimikyu need to be judged in the last else block
             nbt.setString(NbtKeys.FORM, pokemonForm.getName().toLowerCase());
         } else if (this.species.is(EnumSpecies.Xerneas)) {
             if (pokemonForm.getName().toLowerCase().endsWith("creator")) {
@@ -736,6 +725,9 @@ public class PokemonBean extends Pokemon {
             } else {
                 nbt.setString("palette", lowerFormName + ("shiny".equals(nbt.getString("palette")) ? "shiny" : ""));
             }
+        } else if (this.species.is(EnumSpecies.Indeedee, EnumSpecies.Basculegion)) {
+            // Huge gender differences
+            nbt.setString(NbtKeys.FORM, this.gender.getName().toLowerCase());
         } else {
             if (this.species.is(EnumSpecies.Meltan)) {
                 if (this.getExtraStats() != null) {

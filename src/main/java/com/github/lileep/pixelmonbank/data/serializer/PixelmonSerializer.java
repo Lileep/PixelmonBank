@@ -59,7 +59,7 @@ public class PixelmonSerializer implements ISerializer {
             try {
                 nbtTagCompound = JsonToNBT.getTagFromJson(map.get(key));
 
-                PokemonBean pokemonBean = new PokemonBean(nbtTagCompound.getUniqueId("UUID"));
+                PokemonBean pokemonBean = new PokemonBean(UUID.fromString(key));
                 pokemonBean.readFromNBTNew(nbtTagCompound);
 
 //                pokemonList.add(Pixelmon.pokemonFactory.create(nbtTagCompound));

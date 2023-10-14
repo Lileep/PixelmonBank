@@ -48,7 +48,7 @@ public class PixelmonBankLocaleConfig {
     public static String slotNumInvalid = "&cInvalid slot number given.";
     public static String slotNumLimited = "&cSlot number must be between 1 and 6.";
     public static String nothing = "&cNothing is in that slot.";
-    public static String partyLastOne = "&cYou must have more than one none egg pixelmon in your party to do this.";
+    public static String partyLastOne = "&cYou must have more than one no egg pixelmon in your party to do this.";
     public static String noLegendary = "&cYou can't send legendary pixelmons to Pixelmon Bank.";
     public static String noUltrabeast = "&cYou can't send ultra beasts to Pixelmon Bank.";
     public static String noEgg = "&cYou can't send pixelmon eggs to Pixelmon Bank.";
