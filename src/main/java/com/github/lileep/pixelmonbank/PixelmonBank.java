@@ -6,6 +6,7 @@ import com.envyful.api.config.yaml.YamlConfigFactory;
 import com.envyful.api.database.Database;
 import com.envyful.api.database.impl.SimpleHikariDatabase;
 import com.envyful.api.forge.command.ForgeCommandFactory;
+import com.envyful.api.forge.command.parser.ForgeAnnotationCommandParser;
 import com.envyful.api.forge.gui.factory.ForgeGuiFactory;
 import com.envyful.api.forge.player.ForgePlayerManager;
 import com.envyful.api.gui.factory.GuiFactory;
@@ -41,7 +42,7 @@ public class PixelmonBank {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.MOD_ID);
     private static PixelmonBank instance;
     private final ForgePlayerManager playerManager = new ForgePlayerManager();
-    private final ForgeCommandFactory commandFactory = new ForgeCommandFactory();
+    private final ForgeCommandFactory commandFactory = new ForgeCommandFactory(ForgeAnnotationCommandParser::new, playerManager);
     private PixelmonBankConfig config;
     private PixelmonBankLocaleConfig locale;
     private Database database;
@@ -184,7 +185,7 @@ public class PixelmonBank {
 
     @SubscribeEvent
     public void onCommandRegistration(RegisterCommandsEvent event) {
-        this.commandFactory.registerCommand(event.getDispatcher(), new PixelmonBankCmd());
+        this.commandFactory.registerCommand(event.getDispatcher(), this.commandFactory.parseCommand(new PixelmonBankCmd()));
     }
 
     public ForgePlayerManager getPlayerManager() {

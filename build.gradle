@@ -35,10 +35,19 @@ allprojects {
     }
 }
 
+repositories {
+    maven {
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
+    }
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = '1.5.0'
+version = '1.5.1'
 group = 'com.github.lileep.pixelmonbank'
 archivesBaseName = 'PixelmonBank'
 
@@ -52,24 +61,24 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
-    implementation files('libs/Pixelmon-1.16.5-9.1.7-server.jar')
+    implementation fg.deobf('curse.maven:pixelmon-' + 389487 + ':' + 4815379)
+//    implementation files('libs/Pixelmon-1.16.5-9.1.7-server.jar')
 
     shadow 'mysql:mysql-connector-java:8.0.+'
 
     shadow group: 'com.zaxxer', name: 'HikariCP', version: '4.0.1'
-    shadow 'io.lettuce:lettuce-core:6.2.2.RELEASE'
+//    shadow 'io.lettuce:lettuce-core:6.2.2.RELEASE'
 
     shadow group: 'org.spongepowered', name: 'configurate-yaml', version: '4.0.0'
 
-    shadow (group: 'com.envyful.api', name: 'commons', version: '4.8.1')
-    shadow (group: 'com.envyful.api', name: 'forge16', version: '4.8.1'){
+    shadow (group: 'com.envyful.api', name: 'commons', version: '5.5.5')
+    shadow (group: 'com.envyful.api', name: 'forge16', version: '5.5.5'){
         transitive = false
     }
-    shadow (group: 'com.envyful.api', name: 'reforged16', version: '4.8.1') {
+    shadow (group: 'com.envyful.api', name: 'reforged16', version: '5.5.5') {
         transitive = false
     }
 }
-
 shadowJar {
     configurations = [project.configurations.shadow]
     archiveName = archivesBaseName + '-' + rootProject.name + '-' + version + '-Forge.jar'
@@ -83,18 +92,19 @@ shadowJar {
     relocate('com.zaxxer', 'com.github.lileep.pixelmonbank.shade.hikari')
     relocate('org.slf4j', 'com.github.lileep.pixelmonbank.shade.slf4j')
     relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
+    relocate('org.bstats', 'com.github.lileep.pixelmonbank.shade.bstats')
+    relocate('io.netty', 'com.github.lileep.pixelmonbank.shade.netty')
 
     //Extra:
 //    relocate('io.lettuce', 'com.github.lileep.pixelmonbank.shade.lettuce')
-//    relocate('io.netty', 'com.github.lileep.pixelmonbank.shade.netty')
 //    relocate('javax.annotation', 'com.github.lileep.pixelmonbank.shade.annotation')
 //    relocate('org.apache', 'com.github.lileep.pixelmonbank.shade.apache')
 //    relocate('org.reactivestreams', 'com.github.lileep.pixelmonbank.shade.reactivestreams')
 //    relocate('reactor', 'com.github.lileep.pixelmonbank.shade.reactor')
-    //relocate('org.bstats', 'com.github.lileep.pixelmonbank.shade.bstats')
 
     exclude "**/module-info.class"
 }
+
 
 reobf {
     shadowJar {

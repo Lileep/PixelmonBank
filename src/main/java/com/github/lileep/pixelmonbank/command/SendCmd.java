@@ -1,12 +1,11 @@
 package com.github.lileep.pixelmonbank.command;
 
-import com.envyful.api.command.annotate.Child;
 import com.envyful.api.command.annotate.Command;
-import com.envyful.api.command.annotate.Permissible;
 import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
-import com.envyful.api.player.EnvyPlayer;
+import com.envyful.api.command.annotate.permission.Permissible;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
@@ -14,10 +13,10 @@ import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
 import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.google.common.collect.Lists;
+import com.pixelmonmod.pixelmon.api.command.PixelmonCommandUtils;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.stats.BattleStatsType;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
-import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import net.minecraft.entity.player.ServerPlayerEntity;
 
 import java.util.Arrays;
@@ -29,7 +28,6 @@ import java.util.Optional;
         value = "send"
 )
 @Permissible(PermNodeReference.SEND_NODE)
-@Child
 public class SendCmd {
 
     private String getUsage() {
@@ -37,23 +35,23 @@ public class SendCmd {
     }
 
     @CommandProcessor
-    public void run(@Sender ServerPlayerEntity sender, @Argument String[] args) {
+    public void run(@Sender ServerPlayerEntity sender, @Argument int slot, String[] args) {
 
-        if (args.length < 1) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()), sender.getGameProfile().getId());
-            return;
-        }
+//        if (args.length < 1) {
+//            sender.sendMessage(MsgHandler.prefixedColorMsg(this.getUsage()), sender.getGameProfile().getId());
+//            return;
+//        }
 
         //Send
 
         //Slot must in 1-6
-        final int slot;
-        try {
-            slot = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSlotNumInvalid()), sender.getGameProfile().getId());
-            return;
-        }
+//        final int slot;
+//        try {
+//            slot = Integer.parseInt(args[0]);
+//        } catch (NumberFormatException e) {
+//            sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSlotNumInvalid()), sender.getGameProfile().getId());
+//            return;
+//        }
 
         if (slot < 1 || slot > 6) {
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSlotNumLimited()), sender.getGameProfile().getId());
@@ -61,23 +59,18 @@ public class SendCmd {
         }
 
         //Get player storage
-        final PlayerPartyStorage sStorage;
-        if (Optional.ofNullable(StorageProxy.getParty(sender)).isPresent()) {
-            sStorage = StorageProxy.getParty(sender);
-        } else {
+        final PlayerPartyStorage sStorage = PixelmonCommandUtils.getPlayerStorage(sender);
+        if (Optional.ofNullable(sStorage).isEmpty()) {
             return;
         }
 
         //Get pokemon
-        final Pokemon pokemon;
-        if (Optional.ofNullable(sStorage.get(slot - 1)).isPresent()) {
-            pokemon = sStorage.get(slot - 1);
-        } else {
+        final Pokemon pokemon = sStorage.get(slot - 1);
+        if (Optional.ofNullable(pokemon).isEmpty()) {
             //Nothing in the slot
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getNothing()), sender.getGameProfile().getId());
             return;
         }
-        assert pokemon != null;
 
 
         //Check part
@@ -117,7 +110,7 @@ public class SendCmd {
         sStorage.retrieveAll("Command");
 
         //Send logic
-        EnvyPlayer<ServerPlayerEntity> player = PixelmonBank.getInstance().getPlayerManager().getPlayer(sender);
+        ForgeEnvyPlayer player = PixelmonBank.getInstance().getPlayerManager().getPlayer(sender);
         String uuid = player.getUuid().toString();
         if (SyncHandler.getInstance().sendOne(uuid, pokemon)) {
             //Delete player's pixelmon

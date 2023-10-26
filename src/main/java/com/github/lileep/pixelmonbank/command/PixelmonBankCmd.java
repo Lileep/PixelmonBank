@@ -10,8 +10,8 @@ import net.minecraft.command.ICommandSource;
 import net.minecraft.util.Util;
 
 @Command(
-        value = "pixelmonbank",
-        aliases = {
+        value = {
+                "pixelmonbank",
                 "pokemonbank",
                 "pixelbank",
                 "pokebank",

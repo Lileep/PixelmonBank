@@ -1,14 +1,13 @@
 package com.github.lileep.pixelmonbank.command;
 
-import com.envyful.api.command.annotate.Child;
 import com.envyful.api.command.annotate.Command;
-import com.envyful.api.command.annotate.Permissible;
 import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Completable;
 import com.envyful.api.command.annotate.executor.Sender;
+import com.envyful.api.command.annotate.permission.Permissible;
 import com.envyful.api.forge.command.completion.player.PlayerTabCompleter;
-import com.envyful.api.player.EnvyPlayer;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
@@ -20,18 +19,17 @@ import net.minecraft.util.Util;
 import java.util.Optional;
 
 @Command(
-        value = "deleteall",
-        aliases = {
+        value = {
+                "deleteall",
                 "delall"
         }
 )
 @Permissible(PermNodeReference.DELETE_NODE)
-@Child
 public class DeleteAllCmd {
 
     @CommandProcessor
     public void run(@Sender ICommandSource sender, @Completable(PlayerTabCompleter.class) @Argument ServerPlayerEntity target) {
-        EnvyPlayer<ServerPlayerEntity> targetPlayer = PixelmonBank.getInstance().getPlayerManager().getPlayer(target);
+        ForgeEnvyPlayer targetPlayer = PixelmonBank.getInstance().getPlayerManager().getPlayer(target);
         if (Optional.ofNullable(targetPlayer).isEmpty()) {
             return;
         }
