@@ -3,21 +3,19 @@ package com.github.lileep.pixelmonbank.gui;
 import com.envyful.api.forge.chat.UtilChatColour;
 import com.envyful.api.forge.concurrency.UtilForgeConcurrency;
 import com.envyful.api.forge.items.ItemBuilder;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.envyful.api.gui.factory.GuiFactory;
 import com.envyful.api.gui.item.Displayable;
 import com.envyful.api.gui.pane.Pane;
-import com.envyful.api.player.EnvyPlayer;
 import com.envyful.api.reforged.pixelmon.sprite.UtilSprite;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.config.PixelmonItems;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,7 +30,7 @@ public class PixelmonBankGui {
             .clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> envyPlayer.executeCommands("pixelmonbank getall")));
     private static final ItemBuilder INFO_BUTTON_ITEM = new ItemBuilder(new ItemStack(Blocks.GOLD_BLOCK));
 
-    public static void open(EnvyPlayer<EntityPlayerMP> player, Map<Integer, Pokemon> pokemonMap, int page, int count) {
+    public static void open(ForgeEnvyPlayer player, Map<Integer, Pokemon> pokemonMap, int page, int count) {
         Pane pane = GuiFactory.paneBuilder()
                 .topLeftY(0)
                 .topLeftX(0)
@@ -57,7 +55,7 @@ public class PixelmonBankGui {
                             ).build()
                     ).clickHandler((envyPlayer, clickType) -> UtilForgeConcurrency.runSync(() -> {
                                 envyPlayer.executeCommands("pixelmonbank get " + id);
-                                (((EnvyPlayer<EntityPlayerMP>) envyPlayer).getParent()).closeScreen();
+                                player.getParent().closeScreen();
                             })
                     ).build());
         });
@@ -71,7 +69,7 @@ public class PixelmonBankGui {
                     ).build());
         }
 
-        if (page < (count / 45 + 1)) {
+        if (page < (count / 45 + 1) && page > 0) {
             pane.set(8, 5,
                     NEXT_BUTTON.itemStack(NEXT_BUTTON_ITEM
                             .name(UtilChatColour.translateColourCodes('&', PixelmonBankLocaleConfig.pbankGuiNext))

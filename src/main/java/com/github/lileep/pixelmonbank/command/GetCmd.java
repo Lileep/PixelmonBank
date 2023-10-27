@@ -6,6 +6,7 @@ import com.envyful.api.command.annotate.Permissible;
 import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
@@ -42,15 +43,13 @@ public class GetCmd {
         //Get
 
         //Test party
-        PlayerPartyStorage sStorage;
-        if (Optional.ofNullable(Pixelmon.storageManager.getParty(sender)).isPresent()) {
-            sStorage = Pixelmon.storageManager.getParty(sender);
-        } else {
+        PlayerPartyStorage sStorage = Pixelmon.storageManager.getParty(sender);
+        if (!Optional.ofNullable(sStorage).isPresent()) {
             return;
         }
 
         //Get logic
-        EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
+        ForgeEnvyPlayer player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
         String uuid = player.getUuid().toString();
         int id = Integer.parseInt(args[0]);
         Pokemon pokemon = SyncHandler.getInstance().getOne(id, uuid);

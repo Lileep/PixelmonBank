@@ -6,6 +6,7 @@ import com.envyful.api.command.annotate.Permissible;
 import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.envyful.api.player.EnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
@@ -61,23 +62,18 @@ public class SendCmd {
         }
 
         //Get player storage
-        final PlayerPartyStorage sStorage;
-        if (Optional.ofNullable(Pixelmon.storageManager.getParty(sender)).isPresent()) {
-            sStorage = Pixelmon.storageManager.getParty(sender);
-        } else {
+        final PlayerPartyStorage sStorage = Pixelmon.storageManager.getParty(sender);
+        if (!Optional.ofNullable(sStorage).isPresent()) {
             return;
         }
 
         //Get pokemon
-        final Pokemon pokemon;
-        if (Optional.ofNullable(sStorage.get(slot - 1)).isPresent()) {
-            pokemon = sStorage.get(slot - 1);
-        } else {
+        final Pokemon pokemon = sStorage.get(slot - 1);
+        if (!Optional.ofNullable(pokemon).isPresent()) {
             //Nothing in the slot
             sender.sendMessage(MsgHandler.prefixedColorMsg(PixelmonBankLocaleConfig.nothing));
             return;
         }
-        assert pokemon != null;
 
 
         //Check part
@@ -113,7 +109,7 @@ public class SendCmd {
         sStorage.retrieveAll();
 
         //Send logic
-        EnvyPlayer<EntityPlayerMP> player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
+        ForgeEnvyPlayer player = PixelmonBank.instance.getPlayerManager().getPlayer(sender);
         String uuid = player.getUuid().toString();
         if (SyncHandler.getInstance().sendOne(uuid, pokemon)) {
             //Delete player's pixelmon

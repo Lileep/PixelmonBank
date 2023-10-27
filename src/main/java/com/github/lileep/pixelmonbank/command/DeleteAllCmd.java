@@ -8,7 +8,7 @@ import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Completable;
 import com.envyful.api.command.annotate.executor.Sender;
 import com.envyful.api.forge.command.completion.player.PlayerTabCompleter;
-import com.envyful.api.player.EnvyPlayer;
+import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
 import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
@@ -31,7 +31,7 @@ public class DeleteAllCmd {
 
     @CommandProcessor
     public void run(@Sender ICommandSender sender, @Completable(PlayerTabCompleter.class) @Argument EntityPlayerMP target) {
-        EnvyPlayer<EntityPlayerMP> targetPlayer = PixelmonBank.instance.getPlayerManager().getPlayer(target);
+        ForgeEnvyPlayer targetPlayer = PixelmonBank.instance.getPlayerManager().getPlayer(target);
         if (!Optional.ofNullable(targetPlayer).isPresent()) {
             return;
         }

@@ -188,6 +188,7 @@ public class PokemonBean extends Pokemon {
             }
         }
 
+
         if (nbt.hasKey(NbtKeys.ABILITY_SLOT)) {
             this.setAbilitySlot(nbt.getByte(NbtKeys.ABILITY_SLOT));
         } else if (nbt.hasKey(NbtKeys.ABILITY)) {
@@ -406,6 +407,10 @@ public class PokemonBean extends Pokemon {
                 this.extraStats.writeToNBT(nbt);
             }
         }
+
+        //TODO: Write these 2 in future?
+//        nbt.setInteger("PAbilitySlot", this.getAbilitySlot());
+//        nbt.setBoolean("PHiddenAbility", this.getAbility());
 
         //Old ability write method
 //        if (this.abilitySlot != -1) {
