@@ -154,7 +154,7 @@ publishing {
 shadowJar {
     configurations = [project.configurations.shadow]
     setArchiveClassifier('')
-    setArchiveBaseName("${rootProject.name}-Forge")
+    setArchiveBaseName("PixelmonBank-${minecraft_version}-${mod_version}-Forge")
 
     relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
     relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
@@ -188,14 +188,6 @@ shadowJar {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-ext {
-    forgeVersion = "none"
-}
-
-jar {
-    setArchiveBaseName("${rootProject.name}-Forge")
 }
 
 tasks.register('versionedRelease', Copy) {
