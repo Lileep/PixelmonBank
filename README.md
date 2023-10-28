@@ -1,6 +1,6 @@
  ![title img](https://github.com/Lileep/PixelmonBank/blob/master/title.png)
  
-<a href="http://adfoc.us/79708197690596"><img src="https://img.shields.io/badge/Download%20on-adfoc.us-ffff66" alt="adfoc.us"></a>
+<a href="http://adfoc.us/79708197722088"><img src="https://img.shields.io/badge/Download%20on-adfoc.us-ffff66" alt="adfoc.us"></a>
 <a href="https://www.patreon.com/Lileep"><img src="https://img.shields.io/badge/Support-Patreon-ff5733" alt="Patreon"></a>
 <a href="https://afdian.net/a/Lileep"><img src="https://img.shields.io/badge/Support-Afdian-cc99ff" alt="Afdian"></a>
 <img src="https://img.shields.io/badge/Available%20for-MC%201.16.5-33ff99" alt="Supported Versions">
@@ -23,12 +23,12 @@ Server platform independent, enjoy :)
 
 3. [Pixelmon Reforged](https://reforged.gg) 9.1.7+
 
-4. [envyAPI](https://github.com/EnvyWare/API) 4.8.1
+4. [Lastest MC MySQL JDBC](https://www.curseforge.com/minecraft/mc-mods/mysql-jdbc/files) (Only 1.20.2 need it)
 
 
 ## Installation
 
-Put the released .jar into your server's `mods` folder, then start it.
+Put the released .jar into your server's `mods` folder(You need to put the MySQL JDBC mentioned above to the `mods` folder too in 1.20.2), then start it.
 
 Stop your server, change the sql details in `config/pixelmonbank/config.yml`.
 
