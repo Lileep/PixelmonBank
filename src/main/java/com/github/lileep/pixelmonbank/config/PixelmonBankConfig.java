@@ -9,8 +9,7 @@ import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 @ConfigSerializable
 public class PixelmonBankConfig extends AbstractYamlConfig {
 
-    private SQLDatabaseDetails database = new SQLDatabaseDetails("pixelmon-bank-pool", "127.0.0.1", 3306,
-            "root", "root", "pixelbank");
+    private SQLDatabaseDetails database = SQLDatabaseDetails.DEFAULT;
 
     private String serverName = "default_server";
 //    public static Configuration config;
@@ -21,6 +20,7 @@ public class PixelmonBankConfig extends AbstractYamlConfig {
     private boolean allowUntradeable = false;
     private boolean sterilizeWhenWithdraw = false;
     private boolean untradifyWhenWithdraw = false;
+    private boolean resetFriendshipWhenWithdraw = false;
     private String[] restrictList = new String[0];
     private int restrictCount = 1;
     private String[] blackList = new String[0];
@@ -67,6 +67,10 @@ public class PixelmonBankConfig extends AbstractYamlConfig {
 
     public boolean isUntradifyWhenWithdraw() {
         return untradifyWhenWithdraw;
+    }
+
+    public boolean isResetFriendshipWhenWithdraw() {
+        return resetFriendshipWhenWithdraw;
     }
 
     public String[] getRestrictList() {

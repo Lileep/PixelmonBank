@@ -6,6 +6,7 @@ import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.lib.Reference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.pokemon.PokemonFactory;
 import net.minecraft.nbt.CompoundTag;
@@ -27,8 +28,7 @@ public class PixelmonSerializer implements ISerializer {
     public String serialize(Pokemon pokemon) {
         Map<String, String> data = new HashMap<>(1);
 //        Pokemon pokemonBean = new PokemonBean(pokemon.getUUID());
-//        pokemonBean.readFromNBT(pokemon.writeToNBT(new CompoundTag()));
-        //TODO: Deal with nbt compound without considering pokemon uuid. Abstract it.
+//        pokemonBean.readFromNBT(pokemon.writeToNBT(new CompoundNBT()));
         data.put(pokemon.getUUID().toString(), pokemon.writeToNBT(new CompoundTag()).toString());
         return GSON.toJson(data, TYPE);
     }
@@ -39,7 +39,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(dataPack).isPresent()) {
             jsonData = dataPack.getData(getUniqueName());
         } else {
-            PixelmonBank.LOGGER.warn("dataPack is null.");
+            PixelmonBank.LOGGER.error("dataPack is null.");
             return null;
         }
 
@@ -47,7 +47,7 @@ public class PixelmonSerializer implements ISerializer {
         if (Optional.ofNullable(jsonData).isPresent()) {
             map = GSON.fromJson(jsonData, TYPE);
         } else {
-            PixelmonBank.LOGGER.warn("Analyzing json failed.");
+            PixelmonBank.LOGGER.error("Analyzing json failed.");
             return null;
         }
 
@@ -58,12 +58,12 @@ public class PixelmonSerializer implements ISerializer {
             try {
                 compoundTag = TagParser.parseTag(map.get(key));
 
-//                PokemonBean pokemonBean = new PokemonBean((compoundTag.getUUID("UUID")));
+//                PokemonBean pokemonBean = new PokemonBean(UUID.fromString(key));
 //                pokemonBean.readFromNBT(compoundTag);
 //                pokemonList.add(pokemonBean);
                 pokemonList.add(PokemonFactory.create(compoundTag));
-            } catch (Exception e) {
-                PixelmonBank.LOGGER.warn("Failed to write nbt.");
+            } catch (CommandSyntaxException e) {
+                PixelmonBank.LOGGER.error("Failed to write nbt.");
                 return null;
             }
         }

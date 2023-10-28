@@ -1,31 +1,29 @@
 package com.github.lileep.pixelmonbank.command;
 
-import com.envyful.api.command.annotate.Child;
 import com.envyful.api.command.annotate.Command;
-import com.envyful.api.command.annotate.Permissible;
 import com.envyful.api.command.annotate.executor.Argument;
 import com.envyful.api.command.annotate.executor.CommandProcessor;
 import com.envyful.api.command.annotate.executor.Sender;
+import com.envyful.api.command.annotate.permission.Permissible;
 import com.envyful.api.forge.player.ForgeEnvyPlayer;
 import com.github.lileep.pixelmonbank.PixelmonBank;
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.PermNodeReference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
+import com.pixelmonmod.pixelmon.Pixelmon;
+import com.pixelmonmod.pixelmon.api.command.PixelmonCommandUtils;
+import com.pixelmonmod.pixelmon.api.events.PokemonReceivedEvent;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.api.storage.PlayerPartyStorage;
-import com.pixelmonmod.pixelmon.api.storage.StorageProxy;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Command(
         value = "get"
 )
 @Permissible(PermNodeReference.GET_NODE)
-@Child
 public class GetCmd {
 
     private String getUsage() {
@@ -33,27 +31,32 @@ public class GetCmd {
     }
 
     @CommandProcessor
-    public void run(@Sender ServerPlayer sender, @Argument String[] args) {
-
-        if (args.length < 1) {
-            sender.sendSystemMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
-            return;
-        }
+    public void run(@Sender ServerPlayer sender, @Argument int id) {
+//
+//        if (args.length < 1) {
+//            sender.sendSystemMessage(MsgHandler.prefixedColorMsg(this.getUsage()));
+//            return;
+//        }
 
         //Get
 
         //Test party
-        PlayerPartyStorage sStorage;
-        if (Optional.ofNullable(StorageProxy.getParty(sender)).isPresent()) {
-            sStorage = StorageProxy.getParty(sender);
-        } else {
+        PlayerPartyStorage sStorage = PixelmonCommandUtils.getPlayerStorage(sender);
+        if (Optional.ofNullable(sStorage).isEmpty()) {
             return;
         }
 
         //Get logic
         ForgeEnvyPlayer player = PixelmonBank.getInstance().getPlayerManager().getPlayer(sender);
         String uuid = player.getUuid().toString();
-        int id = Integer.parseInt(args[0]);
+//        int id;
+//        try {
+//            id = Integer.parseInt(args[0]);
+//        } catch (NumberFormatException e) {
+//            sender.sendSystemMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSlotNumInvalid()));
+//            return;
+//        }
+
         Pokemon pokemon = SyncHandler.getInstance().getOne(id, uuid);
 
         //whether found this pixelmon
@@ -62,47 +65,19 @@ public class GetCmd {
             return;
         }
 
-        //Judge whether can trigger receive event
-//        if (Optional.ofNullable(server.getPlayerList().getPlayerByUsername(sender.getName())).isPresent()) {
-//            if (Pixelmon.EVENT_BUS.post(new PixelmonReceivedEvent(sender, ReceiveType.Command, pokemon))) {
-//                return;
-//            }
-//        }
-
         //Remove success
-        if (SyncHandler.getInstance().updateTotal(-1, uuid) &&
-                checkAndUpdateRestrict(pokemon, uuid) &&
-                SyncHandler.getInstance().delOne(id, uuid)) {
-
-            operatePokemon(pokemon);
-            sStorage.add(pokemon);
-            sender.sendSystemMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName()));
+        if (!Pixelmon.EVENT_BUS.post(new PokemonReceivedEvent(sender, pokemon, "PixelmonBankCommand"))) {
+            if (SyncHandler.getInstance().delOne(id, uuid)) {
+                PokemonOptUtil.operatePokemon(pokemon);
+                sStorage.add(pokemon);
+//            selfStorage.add(pokemon);
+                sender.sendSystemMessage(MsgHandler.prefixedColorMsg(PixelmonBank.getInstance().getLocale().getSuccessGetMsg(), pokemon.getFormattedDisplayName().getString()));
+            }
         }
 
         //Judge online and send success msg
 //        if (Optional.ofNullable(server.getPlayerList().getPlayerByUsername(sender.getName())).isPresent()) {
 //        }
 
-    }
-
-    private void operatePokemon(Pokemon pokemon) {
-        PixelmonBankConfig pbkConfig = PixelmonBank.getInstance().getConfig();
-        if (pbkConfig.isSterilizeWhenWithdraw()) {
-            pokemon.addFlag("unbreedable");
-        }
-        if (pbkConfig.isUntradifyWhenWithdraw()) {
-            pokemon.addFlag("untradeable");
-        }
-    }
-
-    private boolean checkAndUpdateRestrict(Pokemon pokemon, String playerUUID) {
-        PixelmonBankConfig pbkConfig = PixelmonBank.getInstance().getConfig();
-        if (pbkConfig.getRestrictList().length > 0) {
-            List<String> restrictList = Arrays.asList(pbkConfig.getRestrictList());
-            if (restrictList.contains(pokemon.getTranslatedName().toString().toLowerCase()) || restrictList.contains(pokemon.getSpecies().getName().toLowerCase())) {
-                return SyncHandler.getInstance().updateRestrictCount(-1, playerUUID);
-            }
-        }
-        return true;
     }
 }

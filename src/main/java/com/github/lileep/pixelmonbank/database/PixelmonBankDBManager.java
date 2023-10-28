@@ -1,16 +1,17 @@
 package com.github.lileep.pixelmonbank.database;
 
 import com.github.lileep.pixelmonbank.PixelmonBank;
-import com.github.lileep.pixelmonbank.config.PixelmonBankConfig;
 import com.github.lileep.pixelmonbank.data.DataPack;
 
-import javax.xml.crypto.Data;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PixelmonBankDBManager {
 
@@ -23,13 +24,14 @@ public class PixelmonBankDBManager {
         return instance;
     }
 
-    public int sendOne(String playerUUID, DataPack dataPack) {
+    public int sendOne(String playerUUID, DataPack dataPack, String pokemonName) {
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
              PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SEND_ONE, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
         ) {
             statement.setString(1, playerUUID);
             statement.setBlob(2, dataPack.toStream());
             statement.setString(3, PixelmonBank.getInstance().getConfig().getServerName());
+            statement.setString(4, pokemonName);
             return statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,7 +82,7 @@ public class PixelmonBankDBManager {
 //        List<DataPack> packList = new ArrayList<>();
         Map<Integer, DataPack> packMap = new LinkedHashMap<>();
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL_PAGEABLE, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase(), PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_ALL_PAGEABLE, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
         ) {
             statement.setString(1, playerUUID);
             statement.setInt(2, pageStart);
@@ -123,22 +125,9 @@ public class PixelmonBankDBManager {
         }
         return 0;
     }
-
-    public int resetPlayerInfo(String playerUUID) {
+    public int getTotal(String playerUUID) {
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.RESET_PLAYER_INFO, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
-        ) {
-            statement.setString(1, playerUUID);
-            return statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    public int getPlayerInfo(String info, String playerUUID) {
-        try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.SELECT_PLAYER_INFO, info, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_TOTAL, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
         ) {
             statement.setString(1, playerUUID);
             ResultSet resultSet = statement.executeQuery();
@@ -148,19 +137,22 @@ public class PixelmonBankDBManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;
+        return 0;
     }
 
-    public int updatePlayerInfo(String info, int amount, String playerUUID) {
+    public List<String> getPokemonNames(String playerUUID) {
+        List<String> pokemonNames = new ArrayList<>();
         try (Connection connection = PixelmonBank.getInstance().getDatabase().getConnection();
-             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.UPDATE_PLAYER_INFO, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase(), info, info))
+             PreparedStatement statement = connection.prepareStatement(String.format(PixelmonBankQueries.GET_POKEMON_NAMES, PixelmonBank.getInstance().getConfig().getDatabase().getDatabase()))
         ) {
-            statement.setInt(1, amount);
-            statement.setString(2, playerUUID);
-            return statement.executeUpdate();
+            statement.setString(1, playerUUID);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                pokemonNames.add(resultSet.getString(1));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return pokemonNames;
     }
 }

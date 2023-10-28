@@ -2,8 +2,8 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-	id("com.github.johnrengelman.shadow") version "8.1.1"
+    id 'net.minecraftforge.gradle' version '[6.0.14,6.2)'
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 version = mod_version
@@ -60,40 +60,49 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-        maven { url = "https://jitpack.io" }
-        maven { url = 'https://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url = 'https://maven.aliyun.com/nexus/content/repositories/jcenter'}
-        maven { url = 'https://plugins.gradle.org/m2/' }
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url 'https://repo.lucko.me/' }
-        maven { url "https://repo.aikar.co/content/groups/aikar/" }
-        maven { url "https://maven.envyware.co.uk/releases"}
-        maven { url = 'https://repo.spongepowered.org/maven'}
-        mavenCentral()
-        flatDir {
-            dirs 'libs'
+    maven { url = "https://jitpack.io" }
+    maven { url = 'https://maven.aliyun.com/nexus/content/groups/public/' }
+    maven { url = 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+    maven { url = 'https://plugins.gradle.org/m2/' }
+    maven { url = 'https://files.minecraftforge.net/maven' }
+    maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://repo.lucko.me/' }
+    maven { url "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url "https://maven.envyware.co.uk/releases" }
+    maven { url = 'https://repo.spongepowered.org/maven' }
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+
+    ivy {
+        setUrl('https://download.nodecdn.net/containers/reforged/server/release')
+        metadataSources {
+            artifact()
         }
+        patternLayout {
+            artifact('[revision]/[artifact].[ext]')
+        }
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-	implementation 'pixelmon:Pixelmon-1.20.1-9.2.2-server:9.2.2'
+    implementation 'pixelmon:Pixelmon-1.20.2-9.2.4-server:9.2.4'
 
 //    shadow 'mysql:mysql-connector-java:8.0.+'
 
-//    shadow group: 'com.zaxxer', name: 'HikariCP', version: '4.0.1'
+//    shadow 'io.dropwizard.metrics:metrics-healthchecks:4.2.19'
+//    shadow group: 'com.zaxxer', name: 'HikariCP', version: '5.0.1'
 
-    implementation group: 'org.spongepowered', name: 'configurate-yaml', version: '4.0.0'
+    shadow group: 'org.spongepowered', name: 'configurate-yaml', version: '4.2.0-COMMENTS'
 
-    shadow group: 'com.cronutils', name: 'cron-utils', version: '9.2.0'
-
-    shadow group: 'com.envyful.api', name: 'commons', version: '5.1.7'
-    shadow (group: 'com.envyful.api', name: 'forge20', version: '5.1.7') {
+    shadow group: 'com.envyful.api', name: 'commons', version: '5.5.2'
+    shadow(group: 'com.envyful.api', name: 'forge20', version: '5.5.2') {
         transitive = false;
     }
-    shadow (group: 'com.envyful.api', name: 'reforged20', version: '5.1.7') {
+    shadow(group: 'com.envyful.api', name: 'reforged20', version: '5.5.2') {
         transitive = false;
     }
 }
@@ -150,23 +159,25 @@ shadowJar {
     relocate('org.spongepowered.configurate', 'com.github.lileep.pixelmonbank.shade.configurate')
     relocate('org.yaml.snakeyaml', 'com.github.lileep.pixelmonbank.shade.snakeyaml')
     relocate('io.leangen.geantyref', 'com.github.lileep.pixelmonbank.shade.geantyref')
-    relocate('com.google.gson', 'com.github.lileep.pixelmonbank.shade.gson')
+//    relocate('com.google.gson', 'com.github.lileep.pixelmonbank.shade.gson')
     relocate('com.zaxxer', 'com.github.lileep.pixelmonbank.shade.hikari')
     relocate('org.slf4j', 'com.github.lileep.pixelmonbank.shade.slf4j')
     relocate('com.envyful.api', 'com.github.lileep.pixelmonbank.shade.envy.api')
     relocate('org.bstats', 'com.github.lileep.pixelmonbank.shade.bstats')
-    relocate('com.google.common', 'com.github.lileep.pixelmonbank.shade.guava')
+//    relocate('com.google.common', 'com.github.lileep.pixelmonbank.shade.guava')
     relocate('org.apache.logging', 'com.github.lileep.pixelmonbank.shade.log4j')
     relocate('io.netty', 'com.github.lileep.pixelmonbank.shade.netty')
     relocate('io.lettuce', 'com.github.lileep.pixelmonbank.shade.lettuce')
     relocate('com.cronutils', 'com.github.lileep.pixelmonbank.shade.cronutils')
     relocate('com.cronutils', 'com.github.lileep.pixelmonbank.shade.cronutils')
     relocate('com.sun.el', 'com.github.lileep.pixelmonbank.shade.sun.el')
-    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
-    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
+//    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
+//    relocate('javax', 'com.github.lileep.pixelmonbank.shade.javax')
     relocate('org.reactivestreams', 'com.github.lileep.pixelmonbank.shade.reactivestreams')
     relocate('reactor', 'com.github.lileep.pixelmonbank.shade.reactor')
 
+    exclude "com/google/**"
+    exclude "javax/**"
     exclude "**/module-info.class"
     exclude "**/*.properties"
     exclude "**/*.xml"
@@ -179,7 +190,15 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
-task versionedRelease(type: Copy) {
+ext {
+    forgeVersion = "none"
+}
+
+jar {
+    setArchiveBaseName("${rootProject.name}-Forge")
+}
+
+tasks.register('versionedRelease', Copy) {
     dependsOn('shadowJar')
     delete fileTree('../release/') {
         include '**/*.jar'
@@ -189,7 +208,7 @@ task versionedRelease(type: Copy) {
     into('../release/')
     include '*.jar'
     rename { String filename ->
-        filename.replace("-${version}.jar", "-${project.version}-${forgeVersion}.jar")
+        filename.replace("-${version}.jar", "-${project.version}.jar")
     }
 }
 

@@ -6,6 +6,7 @@ import com.envyful.api.config.yaml.YamlConfigFactory;
 import com.envyful.api.database.Database;
 import com.envyful.api.database.impl.SimpleHikariDatabase;
 import com.envyful.api.forge.command.ForgeCommandFactory;
+import com.envyful.api.forge.command.parser.ForgeAnnotationCommandParser;
 import com.envyful.api.forge.gui.factory.ForgeGuiFactory;
 import com.envyful.api.forge.player.ForgePlayerManager;
 import com.envyful.api.gui.factory.GuiFactory;
@@ -15,9 +16,9 @@ import com.github.lileep.pixelmonbank.config.PixelmonBankLocaleConfig;
 import com.github.lileep.pixelmonbank.data.serializer.PixelmonSerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.database.PixelmonBankQueries;
-import com.github.lileep.pixelmonbank.event.PbkEventHandler;
 import com.github.lileep.pixelmonbank.handler.SyncHandler;
 import com.github.lileep.pixelmonbank.lib.Reference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -28,10 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Arrays;
+import java.util.HashSet;
 
 @Mod(Reference.MOD_ID)
 public class PixelmonBank {
@@ -39,7 +39,7 @@ public class PixelmonBank {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.MOD_ID);
     private static PixelmonBank instance;
     private final ForgePlayerManager playerManager = new ForgePlayerManager();
-    private final ForgeCommandFactory commandFactory = new ForgeCommandFactory();
+    private final ForgeCommandFactory commandFactory = new ForgeCommandFactory(ForgeAnnotationCommandParser::new, playerManager);
     private PixelmonBankConfig config;
     private PixelmonBankLocaleConfig locale;
     private Database database;
@@ -64,13 +64,15 @@ public class PixelmonBank {
         try {
             this.config = YamlConfigFactory.getInstance(PixelmonBankConfig.class);
             this.locale = YamlConfigFactory.getInstance(PixelmonBankLocaleConfig.class);
+            PokemonOptUtil.RESTRICT_POKEMONS = new HashSet<>(Arrays.asList(this.config.getRestrictList()));
+            PokemonOptUtil.BLACK_LIST_POKEMONS = new HashSet<>(Arrays.asList(this.config.getBlackList()));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     @SubscribeEvent
-    public void onInit(ServerAboutToStartEvent event) {
+    public void preInit(ServerAboutToStartEvent event) {
         PixelmonBank.instance = this;
         GuiFactory.setPlatformFactory(new ForgeGuiFactory());
 
@@ -78,23 +80,18 @@ public class PixelmonBank {
         loadConfig();
 
         UtilConcurrency.runAsync(() -> {
-//            this.database = new PixelmonBankDB(getConfig().getDatabase());
             this.database = new SimpleHikariDatabase(getConfig().getDatabase());
-
             try (Connection connection = this.database.getConnection();
                  PreparedStatement createDB = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_DB, getConfig().getDatabase().getDatabase()));
-                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, getConfig().getDatabase().getDatabase()));
-                 PreparedStatement createPlayerInfoTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PLAYER_TABLE, getConfig().getDatabase().getDatabase()))
+                 PreparedStatement createPbkTable = connection.prepareStatement(String.format(PixelmonBankQueries.CREATE_PBK_TABLE, getConfig().getDatabase().getDatabase()))
             ) {
                 createDB.executeUpdate();
                 createPbkTable.executeUpdate();
-                createPlayerInfoTable.executeUpdate();
                 checkAndUpdateDB(connection);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         });
-
         PixelmonBankDBManager.getInstance();
     }
 
@@ -108,6 +105,7 @@ public class PixelmonBank {
             int timePointIndex = -1;
             int visibleIndex = -1;
             int withdrawTimeIndex = -1;
+            int pixelmonNameIndex = -1;
             int index = 0;
             while (rs.next()) {
                 String columnName = rs.getString("Field");
@@ -119,6 +117,8 @@ public class PixelmonBank {
                     visibleIndex = index;
                 } else if ("withdraw_time".equals(columnName)) {
                     withdrawTimeIndex = index;
+                } else if ("pixelmon_name".equals(columnName)) {
+                    pixelmonNameIndex = index;
                 }
                 index++;
             }
@@ -156,6 +156,16 @@ public class PixelmonBank {
                     addWithdrawTime.executeUpdate();
                 }
             }
+
+            //Add pixelmon name column and its index
+            if (pixelmonNameIndex == -1) {
+                try (PreparedStatement addPixelmonName = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME, getConfig().getDatabase().getDatabase()));
+                     PreparedStatement addPixelmonNameIndex = connection.prepareStatement(String.format(PixelmonBankQueries.ADD_PIXELMON_NAME_INDEX, getConfig().getDatabase().getDatabase()))
+                ) {
+                    addPixelmonName.executeUpdate();
+                    addPixelmonNameIndex.executeUpdate();
+                }
+            }
             LOGGER.info("DB checking done!");
 
         } catch (SQLException e) {
@@ -164,14 +174,13 @@ public class PixelmonBank {
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public void init(ServerStartingEvent event) {
         SyncHandler.getInstance().register(new PixelmonSerializer());
-        MinecraftForge.EVENT_BUS.register(PbkEventHandler.class);
     }
 
     @SubscribeEvent
     public void onCommandRegistration(RegisterCommandsEvent event) {
-        this.commandFactory.registerCommand(event.getDispatcher(), new PixelmonBankCmd());
+        this.commandFactory.registerCommand(event.getDispatcher(), this.commandFactory.parseCommand(new PixelmonBankCmd()));
     }
 
     public ForgePlayerManager getPlayerManager() {

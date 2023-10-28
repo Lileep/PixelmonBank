@@ -5,6 +5,7 @@ import com.github.lileep.pixelmonbank.data.DataPack;
 import com.github.lileep.pixelmonbank.data.ISerializer;
 import com.github.lileep.pixelmonbank.database.PixelmonBankDBManager;
 import com.github.lileep.pixelmonbank.lib.Reference;
+import com.github.lileep.pixelmonbank.util.PokemonOptUtil;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 
 import java.util.*;
@@ -41,7 +42,8 @@ public class SyncHandler {
         //Access db
         return PixelmonBankDBManager.getInstance().sendOne(
                 playerUUID,
-                dataPack
+                dataPack,
+                pokemon.getSpecies().getName()
         ) > 0;
     }
 
@@ -85,21 +87,17 @@ public class SyncHandler {
         return PixelmonBankDBManager.getInstance().delAll(playerUUID) > 0;
     }
 
-    public boolean resetPlayerInfo(String playerUUID) {
-        return PixelmonBankDBManager.getInstance().resetPlayerInfo(playerUUID) > 0;
-    }
-
     public int getTotal(String playerUUID) {
-        return PixelmonBankDBManager.getInstance().getPlayerInfo("total", playerUUID);
-    }
-    public int getRestrictCount(String playerUUID) {
-        return PixelmonBankDBManager.getInstance().getPlayerInfo("restrict_count", playerUUID);
+        return PixelmonBankDBManager.getInstance().getTotal(playerUUID);
     }
 
-    public boolean updateTotal(int amount, String playerUUID) {
-        return PixelmonBankDBManager.getInstance().updatePlayerInfo("total", amount, playerUUID) > 0;
-    }
-    public boolean updateRestrictCount(int amount, String playerUUID) {
-        return PixelmonBankDBManager.getInstance().updatePlayerInfo("restrict_count", amount, playerUUID) > 0;
+    public int getRestrictCount(String playerUUID) {
+        int count = 0;
+        for (String pokemonName : PixelmonBankDBManager.getInstance().getPokemonNames(playerUUID)) {
+            if (PokemonOptUtil.isRestrict(pokemonName)){
+                count++;
+            }
+        }
+        return count;
     }
 }

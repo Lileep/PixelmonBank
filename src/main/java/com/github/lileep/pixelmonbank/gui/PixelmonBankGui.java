@@ -68,7 +68,7 @@ public class PixelmonBankGui {
                     ).build());
         }
 
-        if (page < (count / 45 + 1)) {
+        if (page < (count / 45 + 1) && page > 0) {
             pane.set(8, 5,
                     NEXT_BUTTON.itemStack(NEXT_BUTTON_ITEM
                             .name(UtilChatColour.colour(PixelmonBank.getInstance().getLocale().getPbankGuiNext()))

@@ -9,14 +9,14 @@ import com.github.lileep.pixelmonbank.handler.MsgHandler;
 import net.minecraft.commands.CommandSource;
 
 @Command(
-        value = "pixelmonbank",
-        aliases = {
-                "pokemonbank",
-                "pixelbank",
-                "pokebank",
-                "pbank",
-                "pbk"
-        }
+        value = {
+                "pixelmonbank",
+        "pokemonbank",
+        "pixelbank",
+        "pokebank",
+        "pbank",
+        "pbk"
+}
 )
 @SubCommands({
         SendCmd.class,
