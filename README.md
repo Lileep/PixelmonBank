@@ -21,14 +21,12 @@ Server platform independent, enjoy :)
 
 2. forge 1.16.5-36.2.39+
 
-3. [Pixelmon Reforged](https://reforged.gg) 9.1.7+
-
-4. [Lastest MC MySQL JDBC](https://www.curseforge.com/minecraft/mc-mods/mysql-jdbc/files) (Only 1.20.2 need it)
+3. [Pixelmon Reforged](https://reforged.gg) 9.1.8+
 
 
 ## Installation
 
-Put the released .jar into your server's `mods` folder(You need to put the MySQL JDBC mentioned above to the `mods` folder too in 1.20.2), then start it.
+Put the released .jar into your server's `mods` folder, then start it.
 
 Stop your server, change the sql details in `config/pixelmonbank/config.yml`.
 
