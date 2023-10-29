@@ -1,6 +1,6 @@
 ![title img](https://github.com/Lileep/PixelmonBank/blob/master/title.png)
 
-<a href="http://adfoc.us/79708197722088"><img src="https://img.shields.io/badge/Download%20on-adfoc.us-ffff66" alt="adfoc.us"></a>
+<a href="http://adfoc.us/79708197790233"><img src="https://img.shields.io/badge/Download%20on-adfoc.us-ffff66" alt="adfoc.us"></a>
 <a href="https://www.patreon.com/Lileep"><img src="https://img.shields.io/badge/Support-Patreon-ff5733" alt="Patreon"></a>
 <a href="https://afdian.net/a/Lileep"><img src="https://img.shields.io/badge/Support-Afdian-cc99ff" alt="Afdian"></a>
 <img src="https://img.shields.io/badge/Available%20for-MC%201.20.2-33ff99" alt="Supported Versions">
