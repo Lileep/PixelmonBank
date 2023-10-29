@@ -147,6 +147,21 @@ public class PixelmonBank {
                     addPixelmonNameIndex.executeUpdate();
                 }
             }
+
+            //Fix timestamp NPE
+            try (PreparedStatement searchTimestamp = connection.prepareStatement(String.format(PixelmonBankQueries.SEARCH_TIMESTAMP, PixelmonBankConfig.DB_DBNAME))
+            ) {
+                rs = searchTimestamp.executeQuery();
+                while (rs.next()) {
+                    String columnName = rs.getString(1);
+                    String type = rs.getString(2);
+                    if ("TIMESTAMP".equalsIgnoreCase(type)) {
+                        PreparedStatement updateTimestamp = connection.prepareStatement(String.format(PixelmonBankQueries.UPDATE_TIMESTAMP, PixelmonBankConfig.DB_DBNAME, columnName, "send_time".equals(columnName) ? "CURRENT_TIMESTAMP":"NULL"));
+                        updateTimestamp.executeUpdate();
+                    }
+                }
+            }
+
             LOGGER.info("DB checking done!");
 
         } catch (SQLException e) {

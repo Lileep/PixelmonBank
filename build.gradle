@@ -27,7 +27,7 @@ allprojects {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: "com.github.johnrengelman.shadow"
 
-version = '1.12.2-1.5.1'
+version = '1.12.2-1.5.2'
 group = 'com.github.lileep'
 archivesBaseName = 'PixelmonBank'
 
