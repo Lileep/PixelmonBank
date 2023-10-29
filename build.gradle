@@ -47,7 +47,7 @@ repositories {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = '1.5.1'
+version = '1.5.2'
 group = 'com.github.lileep.pixelmonbank'
 archivesBaseName = 'PixelmonBank'
 
@@ -62,7 +62,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
     implementation fg.deobf('curse.maven:pixelmon-' + 389487 + ':' + 4815379)
-//    implementation files('libs/Pixelmon-1.16.5-9.1.7-server.jar')
 
     shadow 'mysql:mysql-connector-java:8.0.+'
 

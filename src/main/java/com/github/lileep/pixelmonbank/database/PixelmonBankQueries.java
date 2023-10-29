@@ -9,8 +9,8 @@ public class PixelmonBankQueries {
             "player_uuid    varchar(64)     not null, " +
             "pixelmon_data  blob            not null, " +
             "server_name    varchar(32), " +
-            "send_time      timestamp       not null    default     current_timestamp, " +
-            "withdraw_time  timestamp       default     null, " +
+            "send_time      datetime        not null    default     current_timestamp, " +
+            "withdraw_time  datetime        default     null, " +
             "pixelmon_name  varchar(16)     default     null, " +
             "index(player_uuid)," +
             "index(pixelmon_name)" +
@@ -25,9 +25,11 @@ public class PixelmonBankQueries {
     public static final String REMOVE_TIME_POINT_INDEX = "ALTER TABLE `%s`.`pixelmon_bank` DROP INDEX time_point";
     public static final String REMOVE_OLD_DATA = "delete from `%s`.`pixelmon_bank` where visible=1";
     public static final String REMOVE_VISIBLE = "ALTER TABLE `%s`.`pixelmon_bank` DROP COLUMN visible";
-    public static final String ADD_WITHDRAW_TIME = "ALTER TABLE `%s`.`pixelmon_bank` ADD COLUMN withdraw_time timestamp DEFAULT NULL";
+    public static final String ADD_WITHDRAW_TIME = "ALTER TABLE `%s`.`pixelmon_bank` ADD COLUMN withdraw_time datetime DEFAULT NULL";
     public static final String ADD_PIXELMON_NAME = "ALTER TABLE `%s`.`pixelmon_bank` ADD COLUMN pixelmon_name varchar(16) DEFAULT NULL";
     public static final String ADD_PIXELMON_NAME_INDEX = "ALTER TABLE `%s`.`pixelmon_bank` ADD INDEX (pixelmon_name)";
+    public static final String SEARCH_TIMESTAMP = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = 'pixelmon_bank'";
+    public static final String UPDATE_TIMESTAMP = "ALTER TABLE `%s`.`pixelmon_bank` MODIFY COLUMN `%s` DATETIME DEFAULT %s";
 
 
 
