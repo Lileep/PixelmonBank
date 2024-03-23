@@ -16,7 +16,6 @@ import com.pixelmonmod.pixelmon.battles.status.StatusPersist;
 import com.pixelmonmod.pixelmon.config.PixelmonConfig;
 import com.pixelmonmod.pixelmon.config.RemapHandler;
 import com.pixelmonmod.pixelmon.entities.pixelmon.abilities.AbilityBase;
-import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Gender;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.Pokerus;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats.DeoxysStats;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.extraStats.MeltanStats;
@@ -570,7 +569,7 @@ public class PokemonBean extends Pokemon {
         String form = nbt.getString(NbtKeys.FORM);
         String palette = nbt.getString("palette");
         byte formByte = 0;
-        boolean isShiny = "shiny".equals(nbt.getString("palette"));
+        boolean isShiny = "shiny".equals(palette);
         if (this.species.is(EnumSpecies.Minior)) {
             //If there's no color in palette(like shiny case), by default give it a random one
             byte colorIndex = (byte) RandomHelper.getRandomNumberBetween(0, EnumMinior.values().length - 1);
@@ -645,6 +644,10 @@ public class PokemonBean extends Pokemon {
                 if (this.getExtraStats() != null) {
                     ((MeltanStats) this.extraStats).oresSmelted = nbt.getInteger("NuggetsFed");
                 }
+            }
+
+            if ("shiny".equals(palette)) {
+                palette = "none";
             }
 
             //Process form name to 1.12 format
@@ -766,6 +769,19 @@ public class PokemonBean extends Pokemon {
                 if (!"NoForm".equals(formName)) {
                     //Process form name, trim '_' and '-'
                     String variant = formName.toLowerCase().replace(palette, "").replaceAll("^_+|_+$", "").replaceAll("^-+|-+$", "");
+                    nbt.setString(NbtKeys.FORM, variant);
+                }
+            }
+
+            palette = nbt.getString("palette");
+            if ("base".equals(palette) || "none".equals(palette) || "shiny".equals(palette)) {
+                if (this.species.is(EnumSpecies.Greninja)){
+                    if (pokemonForm==EnumGreninja.BATTLE_BOND) {
+                        String variant = pokemonForm.getName().toLowerCase();
+                        nbt.setString(NbtKeys.FORM, variant);
+                    }
+                } else if (this.species.is(EnumSpecies.Mimikyu)) {
+                    String variant = pokemonForm.getName().toLowerCase();
                     nbt.setString(NbtKeys.FORM, variant);
                 }
             }
